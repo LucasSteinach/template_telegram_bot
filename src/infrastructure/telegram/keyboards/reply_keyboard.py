@@ -10,11 +10,15 @@ class ReplyButton:
 
     row: int = 1
     icon_custom_emoji_id: str | None = None
-    style: Optional[Literal["danger", "success", "primary"]] = None  # red, green or blue
+    style: Optional[Literal["danger", "success", "primary"]] = (
+        None  # red, green or blue
+    )
 
     request_users: t.KeyboardButtonRequestUsers | None = None
     request_chat: t.KeyboardButtonRequestChat | None = None
-    request_managed_bot: t.keyboard_button_request_managed_bot.KeyboardButtonRequestManagedBot | None = None
+    request_managed_bot: (
+        t.keyboard_button_request_managed_bot.KeyboardButtonRequestManagedBot | None
+    ) = None
     request_contact: bool | None = None
     request_location: bool | None = None
     request_poll: t.KeyboardButtonPollType | None = None
@@ -23,7 +27,17 @@ class ReplyButton:
 
     def __post_init__(self):
         non_action_fields = ["text", "row", "icon_custom_emoji_id", "style"]
-        if len([f for f in fields(self) if f.name not in non_action_fields and getattr(self, f.name) is not None]) > 1:
+        if (
+            len(
+                [
+                    f
+                    for f in fields(self)
+                    if f.name not in non_action_fields
+                    and getattr(self, f.name) is not None
+                ]
+            )
+            > 1
+        ):
             raise ValueError(
                 "At most one must be used: url, callback data etc. \n"
                 "See docs https://docs.aiogram.dev/en/latest/api/types/keyboard_button.html"

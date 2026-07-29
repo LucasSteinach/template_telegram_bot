@@ -4,7 +4,10 @@ from aiogram.types import Message
 
 from src.application.dto.user_dto import RegisterUser
 from src.container import Container
-from src.infrastructure.telegram.keyboards.inline_keyboard import inline_kb, InlineButton
+from src.infrastructure.telegram.keyboards.inline_keyboard import (
+    inline_kb,
+    InlineButton,
+)
 
 router = Router(name="start")
 
@@ -26,8 +29,8 @@ async def handle_start(message: Message, container: Container) -> None:
         reply_markup=inline_kb(
             [
                 InlineButton(text="Hi", callback_data="hi"),
-                InlineButton(text="bye", row=3, callback_data="bye")
+                InlineButton(text="bye", row=3, callback_data="bye"),
             ],
-            day="day"
-        )
+            day="day",
+        ),
     )

@@ -11,7 +11,9 @@ class InlineButton:
     row: int = 1
 
     icon_custom_emoji_id: str | None = None
-    style: Optional[Literal["danger", "success", "primary"]] = None  # red, green or blue
+    style: Optional[Literal["danger", "success", "primary"]] = (
+        None  # red, green or blue
+    )
 
     url: str | None = None
     callback_data: str | None = None
@@ -26,7 +28,13 @@ class InlineButton:
 
     def __post_init__(self):
         non_action_fields = ["text", "row", "icon_custom_emoji_id", "style"]
-        if not any([getattr(self, f.name) for f in fields(self) if f.name not in non_action_fields]):
+        if not any(
+            [
+                getattr(self, f.name)
+                for f in fields(self)
+                if f.name not in non_action_fields
+            ]
+        ):
             raise ValueError(
                 "At least one required: url, callback data etc. \n"
                 "See docs https://docs.aiogram.dev/en/latest/api/types/inline_keyboard_button.html"
@@ -80,6 +88,3 @@ def inline_kb(buttons: list[InlineButton], **kwargs) -> t.InlineKeyboardMarkup:
         inline_keyboard=rows,
         **kwargs,
     )
-
-
-

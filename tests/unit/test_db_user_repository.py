@@ -3,7 +3,9 @@ import datetime as d
 import pytest
 
 from src.domain.entities.user import User
-from src.infrastructure.database.repositories.user_repository import SqlAlchemyUserRepository
+from src.infrastructure.database.repositories.user_repository import (
+    SqlAlchemyUserRepository,
+)
 
 
 @pytest.mark.asyncio

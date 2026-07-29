@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import pytest
 
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+)
 
 from src.infrastructure.telegram.keyboards import inline_keyboard as ik
 from src.infrastructure.telegram.keyboards import reply_keyboard as rk
@@ -18,7 +23,8 @@ def test_inline_button():
     with pytest.raises(
         ValueError,
         match="At least one required: url, callback data etc. \n"
-              "See docs https://docs.aiogram.dev/en/latest/api/types/inline_keyboard_button.html"):
+        "See docs https://docs.aiogram.dev/en/latest/api/types/inline_keyboard_button.html",
+    ):
         ik.InlineButton(
             text="button_name",
         )
@@ -70,7 +76,6 @@ def test_inline_keyboard():
             row=3,
             callback_data="cb_3",
         ),
-
     ]
 
     with pytest.raises(ValueError, match="input contains no buttons"):
@@ -91,7 +96,7 @@ def test_reply_button():
     with pytest.raises(
         ValueError,
         match="At most one must be used: url, callback data etc. \n"
-              "See docs https://docs.aiogram.dev/en/latest/api/types/keyboard_button.html",
+        "See docs https://docs.aiogram.dev/en/latest/api/types/keyboard_button.html",
     ):
         rk.ReplyButton(
             text="button_name",
@@ -106,7 +111,9 @@ def test_reply_button():
         )
 
     with pytest.raises(ValueError, match="max button label length is 64"):
-        rk.ReplyButton(text="more_than_64_symbols_more_than_64_symbols_more_than_64_symbols_more_than_64_symbols")
+        rk.ReplyButton(
+            text="more_than_64_symbols_more_than_64_symbols_more_than_64_symbols_more_than_64_symbols"
+        )
 
     dto_button = rk.ReplyButton(
         text="button_name",
@@ -132,7 +139,6 @@ def test_reply_keyboard():
             text="button_3",
             row=3,
         ),
-
     ]
 
     with pytest.raises(ValueError, match="input contains no buttons"):

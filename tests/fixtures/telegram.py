@@ -7,11 +7,7 @@ from aiogram.types import Message, Chat, User
 @pytest.fixture
 def user():
     return User(
-        id=123,
-        is_bot=False,
-        first_name="User",
-        last_name="Name",
-        username="Test User"
+        id=123, is_bot=False, first_name="User", last_name="Name", username="Test User"
     )
 
 
@@ -19,7 +15,7 @@ def user():
 def chat():
     return Chat(
         id=4321,
-        type='private',  # also possible 'group', 'supergroup' or 'channel'
+        type="private",  # also possible 'group', 'supergroup' or 'channel'
     )
 
 

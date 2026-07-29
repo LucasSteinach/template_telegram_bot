@@ -7,13 +7,13 @@ from src.container import Container
 from src.infrastructure.database.models import UserModel
 from src.infrastructure.telegram import bot as b
 from src.infrastructure.telegram.handlers.start import handle_start
-from src.infrastructure.telegram.middlewares.container_middleware import ContainerMiddleware
+from src.infrastructure.telegram.middlewares.container_middleware import (
+    ContainerMiddleware,
+)
 
 
 @pytest.mark.asyncio
-async def test_bot(
-    session, session_factory, message, user
-):
+async def test_bot(session, session_factory, message, user):
     fake_settings = MagicMock()
     fake_settings.bot_token = "123:test"
 
@@ -21,29 +21,19 @@ async def test_bot(
 
     assert bot.token == "123:test"
 
-    container = Container(
-        session_factory=session_factory
-    )
+    container = Container(session_factory=session_factory)
     dispatcher = b.create_dispatcher(container)
     middlewares = dispatcher.update.outer_middleware._middlewares
 
     assert dispatcher is not None
     assert any(
-
-        isinstance(middleware, ContainerMiddleware)
-
-        for middleware in middlewares
-
+        isinstance(middleware, ContainerMiddleware) for middleware in middlewares
     )
 
 
 @pytest.mark.asyncio
-async def test_handler_start(
-    session, session_factory, message, user
-):
-    container = Container(
-        session_factory=session_factory
-    )
+async def test_handler_start(session, session_factory, message, user):
+    container = Container(session_factory=session_factory)
 
     message.answer = AsyncMock()
 

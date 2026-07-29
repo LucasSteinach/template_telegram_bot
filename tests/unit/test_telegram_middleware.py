@@ -5,7 +5,9 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock
 
 from src.container import Container
-from src.infrastructure.telegram.middlewares.container_middleware import ContainerMiddleware
+from src.infrastructure.telegram.middlewares.container_middleware import (
+    ContainerMiddleware,
+)
 
 
 @pytest.mark.asyncio
@@ -22,8 +24,3 @@ async def test_container_middleware(session):
 
     handler.assert_awaited_once_with(event, data)
     assert data["container"] is container
-
-
-
-
-
