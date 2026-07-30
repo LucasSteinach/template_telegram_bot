@@ -5,8 +5,7 @@ from aiogram.types import Message
 from src.application.dto.user_dto import RegisterUser
 from src.container import Container
 from src.infrastructure.telegram.keyboards.inline_keyboard import (
-    InlineButton,
-    inline_kb,
+    top_level_kb,
 )
 
 router = Router(name="start")
@@ -26,10 +25,5 @@ async def handle_start(message: Message, container: Container) -> None:
 
     await message.answer(
         f"Hi, {user.full_name}!",
-        reply_markup=inline_kb(
-            [
-                InlineButton(text="option 1", callback_data="option_1"),
-                InlineButton(text="option 2", callback_data="option_2"),
-            ],
-        ),
+        reply_markup=top_level_kb,
     )

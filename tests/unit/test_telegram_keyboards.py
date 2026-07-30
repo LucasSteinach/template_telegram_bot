@@ -10,6 +10,12 @@ from aiogram.types import (
 
 from src.infrastructure.telegram.keyboards import inline_keyboard as ik
 from src.infrastructure.telegram.keyboards import reply_keyboard as rk
+from src.infrastructure.telegram.keyboards.inline_keyboard import (
+    BACK_TEXT,
+    create_back_button,
+    has_button,
+    top_level_kb,
+)
 
 
 def test_inline_button():
@@ -147,3 +153,21 @@ def test_reply_keyboard():
 
     assert isinstance(keyboard, ReplyKeyboardMarkup)
     assert len(keyboard.model_dump()["keyboard"]) == len(buttons)
+
+
+def test_create_back_button():
+    button_1 = create_back_button("some_path")
+    button_2 = create_back_button("path.subpath")
+
+    assert isinstance(button_1, InlineKeyboardButton)
+    assert isinstance(button_2, InlineKeyboardButton)
+    assert button_1.callback_data == "menu:root"
+    assert button_2.callback_data == "menu:path"
+
+
+def test_has_button():
+    kb = top_level_kb.model_copy()
+    assert not has_button(kb, BACK_TEXT)
+
+    kb.inline_keyboard.append([create_back_button("some_path")])
+    assert has_button(kb, BACK_TEXT)

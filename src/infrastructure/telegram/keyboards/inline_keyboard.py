@@ -2,6 +2,13 @@ from dataclasses import dataclass, fields
 from typing import Literal
 
 import aiogram.types as t
+from aiogram.filters.callback_data import CallbackData
+
+BACK_TEXT = "⬅ Back"
+
+
+class MenuCallback(CallbackData, prefix="menu"):
+    path: str
 
 
 @dataclass
@@ -27,9 +34,9 @@ class InlineButton:
     def __post_init__(self):
         non_action_fields = ["text", "row", "icon_custom_emoji_id", "style"]
         if not any(
-                getattr(self, f.name)
-                for f in fields(self)
-                if f.name not in non_action_fields
+            getattr(self, f.name)
+            for f in fields(self)
+            if f.name not in non_action_fields
         ):
             raise ValueError(
                 "At least one required: url, callback data etc. \n"
@@ -67,6 +74,24 @@ def create_button(dto: InlineButton) -> t.InlineKeyboardButton:
     )
 
 
+def create_back_button(path: str) -> t.InlineKeyboardButton:
+    return t.InlineKeyboardButton(
+        text=BACK_TEXT,
+        callback_data=MenuCallback(
+            path=".".join(path.split(".")[:-1]) or "root"
+        ).pack(),
+    )
+
+
+def has_button(
+    keyboard: t.InlineKeyboardMarkup,
+    label: str,
+) -> bool:
+    return any(
+        button.text == label for row in keyboard.inline_keyboard for button in row
+    )
+
+
 def inline_kb(buttons: list[InlineButton], **kwargs) -> t.InlineKeyboardMarkup:
     """
     Creates InlineKeyboardMarkup.
@@ -84,3 +109,33 @@ def inline_kb(buttons: list[InlineButton], **kwargs) -> t.InlineKeyboardMarkup:
         inline_keyboard=rows,
         **kwargs,
     )
+
+
+top_level_kb = inline_kb(
+    [
+        InlineButton(
+            text="option 1", callback_data=MenuCallback(path="option_1").pack()
+        ),
+        InlineButton(
+            text="option 2", callback_data=MenuCallback(path="option_2").pack()
+        ),
+    ],
+)
+
+option_1_kb = inline_kb(
+    [
+        InlineButton(
+            text="sub option 1",
+            callback_data=MenuCallback(path="option_1.sub_option_1").pack(),
+        ),
+    ]
+)
+
+option_2_kb = inline_kb(
+    [
+        InlineButton(
+            text="sub option 2",
+            callback_data=MenuCallback(path="option_2.sub_option_2").pack(),
+        ),
+    ]
+)
