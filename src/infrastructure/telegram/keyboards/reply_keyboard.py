@@ -1,5 +1,5 @@
 from dataclasses import dataclass, fields
-from typing import Optional, Literal
+from typing import Literal
 
 import aiogram.types as t
 
@@ -10,9 +10,7 @@ class ReplyButton:
 
     row: int = 1
     icon_custom_emoji_id: str | None = None
-    style: Optional[Literal["danger", "success", "primary"]] = (
-        None  # red, green or blue
-    )
+    style: Literal["danger", "success", "primary"] | None = None  # red, green or blue
 
     request_users: t.KeyboardButtonRequestUsers | None = None
     request_chat: t.KeyboardButtonRequestChat | None = None
@@ -78,7 +76,7 @@ def reply_kb(buttons: list[ReplyButton], **kwargs) -> t.ReplyKeyboardMarkup:
     if len(buttons) == 0:
         raise ValueError("input contains no buttons")
 
-    rows = [list() for _ in range(max(list(map(lambda x: x.row, buttons))))]
+    rows = [[] for _ in range(max([x.row for x in buttons]))]
     for button in buttons:
         rows[button.row - 1].append(create_button(button))
 

@@ -1,9 +1,8 @@
-from unittest.mock import AsyncMock, ANY, MagicMock
+from unittest.mock import ANY, AsyncMock
 
 import pytest
 from sqlalchemy import select
 
-from src.container import Container
 from src.infrastructure.database.models import UserModel
 from src.infrastructure.telegram import bot as b
 from src.infrastructure.telegram.handlers.start import handle_start
@@ -13,15 +12,7 @@ from src.infrastructure.telegram.middlewares.container_middleware import (
 
 
 @pytest.mark.asyncio
-async def test_bot(session, session_factory, message, user):
-    fake_settings = MagicMock()
-    fake_settings.bot_token = "123:test"
-
-    bot = b.create_bot(fake_settings)
-
-    assert bot.token == "123:test"
-
-    container = Container(session_factory=session_factory)
+async def test_bot(bot, container, session, session_factory, message, user):
     dispatcher = b.create_dispatcher(container)
     middlewares = dispatcher.update.outer_middleware._middlewares
 
@@ -32,9 +23,7 @@ async def test_bot(session, session_factory, message, user):
 
 
 @pytest.mark.asyncio
-async def test_handler_start(session, session_factory, message, user):
-    container = Container(session_factory=session_factory)
-
+async def test_handler_start(container, session, session_factory, message, user):
     message.answer = AsyncMock()
 
     await handle_start(

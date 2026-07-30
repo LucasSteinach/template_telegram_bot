@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import pytest
-
 from aiogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    ReplyKeyboardMarkup,
     KeyboardButton,
+    ReplyKeyboardMarkup,
 )
 
 from src.infrastructure.telegram.keyboards import inline_keyboard as ik
@@ -79,7 +78,7 @@ def test_inline_keyboard():
     ]
 
     with pytest.raises(ValueError, match="input contains no buttons"):
-        assert ik.inline_kb([])  # noqa
+        assert ik.inline_kb([])
 
     keyboard = ik.inline_kb(buttons)
 

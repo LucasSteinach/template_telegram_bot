@@ -1,7 +1,18 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from aiogram.types import Message, Chat, User
+from aiogram.types import Chat, Message, User
+
+from src.infrastructure.telegram import bot as tg_bot
+
+
+@pytest.fixture()
+def bot():
+    fake_settings = MagicMock()
+    fake_settings.bot_token = "123:test"
+
+    b = tg_bot.create_bot(fake_settings)
+    return b
 
 
 @pytest.fixture

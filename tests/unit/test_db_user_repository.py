@@ -19,7 +19,7 @@ async def test_db_user_repository(session):
         telegram_id=123,
         username="test",
         full_name="Very Test User",
-        created_at=d.datetime.now(),
+        created_at=d.datetime.now(tz=d.UTC),
     )
 
     await repository.save(user)

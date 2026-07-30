@@ -1,9 +1,9 @@
-import pytest
-
 from unittest.mock import MagicMock
 
-from src.container import Container
+import pytest
+
 from src.application.use_cases.register_user import RegisterUserUseCase
+from src.container import Container
 
 
 @pytest.mark.asyncio

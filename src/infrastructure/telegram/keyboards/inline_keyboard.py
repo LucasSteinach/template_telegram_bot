@@ -1,5 +1,5 @@
 from dataclasses import dataclass, fields
-from typing import Optional, Literal
+from typing import Literal
 
 import aiogram.types as t
 
@@ -11,9 +11,7 @@ class InlineButton:
     row: int = 1
 
     icon_custom_emoji_id: str | None = None
-    style: Optional[Literal["danger", "success", "primary"]] = (
-        None  # red, green or blue
-    )
+    style: Literal["danger", "success", "primary"] | None = None  # red, green or blue
 
     url: str | None = None
     callback_data: str | None = None
@@ -29,11 +27,9 @@ class InlineButton:
     def __post_init__(self):
         non_action_fields = ["text", "row", "icon_custom_emoji_id", "style"]
         if not any(
-            [
                 getattr(self, f.name)
                 for f in fields(self)
                 if f.name not in non_action_fields
-            ]
         ):
             raise ValueError(
                 "At least one required: url, callback data etc. \n"
@@ -79,7 +75,7 @@ def inline_kb(buttons: list[InlineButton], **kwargs) -> t.InlineKeyboardMarkup:
     """
     if len(buttons) == 0:
         raise ValueError("input contains no buttons")
-    rows = [list() for _ in range(max(list(map(lambda x: x.row, buttons))))]
+    rows = [[] for _ in range(max([x.row for x in buttons]))]
 
     for button in buttons:
         rows[button.row - 1].append(create_button(button))

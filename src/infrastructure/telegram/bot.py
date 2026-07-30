@@ -4,10 +4,8 @@ from aiogram.enums import ParseMode
 
 from src.container import Container
 from src.infrastructure.config.settings import Settings
-from src.infrastructure.telegram.handlers import register_all_routers
-from src.infrastructure.telegram.middlewares.container_middleware import (
-    ContainerMiddleware,
-)
+from src.infrastructure.telegram.handlers import register_routers
+from src.infrastructure.telegram.middlewares import register_middlewares
 
 
 def create_bot(settings: Settings) -> Bot:
@@ -19,7 +17,6 @@ def create_bot(settings: Settings) -> Bot:
 
 def create_dispatcher(container: Container) -> Dispatcher:
     dp = Dispatcher()
-    dp.update.outer_middleware(ContainerMiddleware(container))
-    register_all_routers(dp)
-    print(dp.sub_routers)
+    register_middlewares(dp, container)
+    register_routers(dp)
     return dp
