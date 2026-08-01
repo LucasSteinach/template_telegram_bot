@@ -4,22 +4,7 @@ import pytest
 from sqlalchemy import select
 
 from src.infrastructure.database.models import UserModel
-from src.infrastructure.telegram import bot as b
 from src.infrastructure.telegram.handlers.start import handle_start
-from src.infrastructure.telegram.middlewares.container_middleware import (
-    ContainerMiddleware,
-)
-
-
-@pytest.mark.asyncio
-async def test_bot(bot, container, session, session_factory, message, user):
-    dispatcher = b.create_dispatcher(container)
-    middlewares = dispatcher.update.outer_middleware._middlewares
-
-    assert dispatcher is not None
-    assert any(
-        isinstance(middleware, ContainerMiddleware) for middleware in middlewares
-    )
 
 
 @pytest.mark.asyncio

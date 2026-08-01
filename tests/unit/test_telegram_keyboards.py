@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 from aiogram.types import (
     InlineKeyboardButton,
@@ -10,12 +8,7 @@ from aiogram.types import (
 
 from src.infrastructure.telegram.keyboards import inline_keyboard as ik
 from src.infrastructure.telegram.keyboards import reply_keyboard as rk
-from src.infrastructure.telegram.keyboards.inline_keyboard import (
-    BACK_TEXT,
-    create_back_button,
-    has_button,
-    top_level_kb,
-)
+from src.infrastructure.telegram.keyboards.dto import MENU
 
 
 def test_inline_button():
@@ -83,13 +76,13 @@ def test_inline_keyboard():
         ),
     ]
 
-    with pytest.raises(ValueError, match="input contains no buttons"):
-        assert ik.inline_kb([])
+    input_no_buttons = ik.inline_kb([])
+    assert input_no_buttons is None
 
     keyboard = ik.inline_kb(buttons)
 
     assert isinstance(keyboard, InlineKeyboardMarkup)
-    assert len(keyboard.model_dump()["inline_keyboard"]) == len(buttons)
+    assert len(keyboard.inline_keyboard) == len(buttons)
 
 
 def test_reply_button():
@@ -156,8 +149,8 @@ def test_reply_keyboard():
 
 
 def test_create_back_button():
-    button_1 = create_back_button("some_path")
-    button_2 = create_back_button("path.subpath")
+    button_1 = ik.create_back_button("some_path")
+    button_2 = ik.create_back_button("path.subpath")
 
     assert isinstance(button_1, InlineKeyboardButton)
     assert isinstance(button_2, InlineKeyboardButton)
@@ -166,8 +159,68 @@ def test_create_back_button():
 
 
 def test_has_button():
-    kb = top_level_kb.model_copy()
-    assert not has_button(kb, BACK_TEXT)
+    kb = ik.build_keyboard(MENU, "root")
+    assert ik.has_button(kb, next(c.button_text for c in MENU.children))
+    assert not ik.has_button(kb, "incorrect_text")
 
-    kb.inline_keyboard.append([create_back_button("some_path")])
-    assert has_button(kb, BACK_TEXT)
+
+def test_build_callback():
+    # MenuItem(type="menu")
+    item_1 = next(c for c in MENU.children if c.type == "menu")
+    # MenuItem(type="action")
+    item_2 = next(c for c in MENU.children if c.type == "action")
+
+    callback = ik.build_callback(item_1, MENU.id)
+    assert callback == ik.MenuCallback(path=item_1.id).pack()
+
+    callback = ik.build_callback(item_2, item_2.id)
+    assert callback == ik.AwaitedActionCallback(action=item_2.id).pack()
+
+
+def test_build_keyboard():
+    no_item_keyboard = ik.build_keyboard(None, "")  # noqa
+    assert no_item_keyboard is None
+
+    root_keyboard = ik.build_keyboard(MENU, "root")
+    assert (
+        next(
+            (
+                b
+                for row in root_keyboard.inline_keyboard
+                for b in row
+                if b.text == ik.BACK_TEXT
+            ),
+            None,
+        )
+        is None
+    )
+
+    item_with_no_keyboard = next(c for c in MENU.children if len(c.children) == 0)
+    keyboard = ik.build_keyboard(item_with_no_keyboard, item_with_no_keyboard.id)
+    assert (
+        next(
+            (
+                b
+                for row in keyboard.inline_keyboard
+                for b in row
+                if b.text == ik.BACK_TEXT
+            ),
+            None,
+        )
+        is not None
+    )
+
+    not_root_item = next(c for c in MENU.children if len(c.children) != 0)
+    keyboard = ik.build_keyboard(not_root_item, not_root_item.id)
+    assert (
+        next(
+            (
+                b
+                for row in keyboard.inline_keyboard
+                for b in row
+                if b.text == ik.BACK_TEXT
+            ),
+            None,
+        )
+        is not None
+    )

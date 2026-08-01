@@ -9,9 +9,8 @@ class Settings(BaseSettings):
     bot_token: str
     database_url: str
     log_level: str = "INFO"
-    fsm_storage: str | None = None
+    fsm_storage: str = ""
     redis_url: str | None = None
-
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env", env_file_encoding="utf-8"
     )

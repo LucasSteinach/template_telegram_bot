@@ -1,10 +1,10 @@
-from unittest.mock import AsyncMock, call, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from aiogram import Dispatcher, Router
 
 from src.infrastructure.telegram.handlers import register_routers
-from src.infrastructure.telegram.handlers.menu import menu_handler, render_menu
+from src.infrastructure.telegram.handlers.menu import menu_handler
 from src.infrastructure.telegram.keyboards.inline_keyboard import MenuCallback
 
 
@@ -25,22 +25,16 @@ def test_handlers_init():
 
 
 @pytest.mark.asyncio
-async def test_handlers_menu(message):
-    callback = AsyncMock()
-    callback.message = message
-    callback.answer = AsyncMock()
-    message.edit_text = AsyncMock()
-    message.edit_reply_markup = AsyncMock()
+async def test_handlers_menu(callback):
     callback_data = MenuCallback(path="root")
+    with patch(
+        "src.infrastructure.telegram.handlers.menu.render_menu",
+        new_callable=AsyncMock,
+    ) as mock_render:
+        await menu_handler(callback, callback_data)
 
-    await menu_handler(callback, callback_data)
-    callback.answer.assert_called_once()
-
-    await render_menu(message, "option_1")
-    await render_menu(message, "wrong_path")
-    await render_menu(message, "option_2")
-
-    message.edit_text.assert_has_calls(
-        [call("Main menu"), call("Menu 'Option 1'"), call("Menu 'Option 2'")]
+    callback.answer.assert_awaited_once()
+    mock_render.assert_awaited_once_with(
+        callback.message,
+        "root",
     )
-    message.edit_reply_markup.await_count = 3

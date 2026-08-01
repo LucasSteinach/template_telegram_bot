@@ -4,9 +4,8 @@ from aiogram.types import Message
 
 from src.application.dto.user_dto import RegisterUser
 from src.container import Container
-from src.infrastructure.telegram.keyboards.inline_keyboard import (
-    top_level_kb,
-)
+from src.infrastructure.telegram.keyboards.inline_keyboard import build_keyboard
+from src.infrastructure.telegram.keyboards.menu import get_menu_item
 
 router = Router(name="start")
 
@@ -25,5 +24,5 @@ async def handle_start(message: Message, container: Container) -> None:
 
     await message.answer(
         f"Hi, {user.full_name}!",
-        reply_markup=top_level_kb,
+        reply_markup=build_keyboard(get_menu_item("root"), "root"),
     )

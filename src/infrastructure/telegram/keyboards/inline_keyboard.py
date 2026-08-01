@@ -1,10 +1,19 @@
+import logging
 from dataclasses import dataclass, fields
 from typing import Literal
 
 import aiogram.types as t
 from aiogram.filters.callback_data import CallbackData
 
+from src.infrastructure.telegram.keyboards.dto import MENU, MenuItem
+
+logger = logging.getLogger(__name__)
+
 BACK_TEXT = "⬅ Back"
+
+
+class AwaitedActionCallback(CallbackData, prefix="action"):
+    action: str
 
 
 class MenuCallback(CallbackData, prefix="menu"):
@@ -92,14 +101,9 @@ def has_button(
     )
 
 
-def inline_kb(buttons: list[InlineButton], **kwargs) -> t.InlineKeyboardMarkup:
-    """
-    Creates InlineKeyboardMarkup.
-    If there are not consecutive row numbers (ex. 1,2,4), telegram removes the gaps automatically
-    Must contain at least one InlineButton
-    """
+def inline_kb(buttons: list[InlineButton], **kwargs) -> t.InlineKeyboardMarkup | None:
     if len(buttons) == 0:
-        raise ValueError("input contains no buttons")
+        return None
     rows = [[] for _ in range(max([x.row for x in buttons]))]
 
     for button in buttons:
@@ -111,31 +115,35 @@ def inline_kb(buttons: list[InlineButton], **kwargs) -> t.InlineKeyboardMarkup:
     )
 
 
-top_level_kb = inline_kb(
-    [
-        InlineButton(
-            text="option 1", callback_data=MenuCallback(path="option_1").pack()
-        ),
-        InlineButton(
-            text="option 2", callback_data=MenuCallback(path="option_2").pack()
-        ),
-    ],
-)
+def build_callback(item: MenuItem, menu_path: str) -> str:
+    """
+    Build callback data for a menu item.
+    Args:
+        item: Menu item for which the callback is created.
+        menu_path: Path to the item without the root id,
+            e.g. option_1.sub_option_1.<item_id>.
+    """
+    match item.type:
+        case "menu":
+            path = item.id if menu_path == MENU.id else f"{menu_path}.{item.id}"
+            return MenuCallback(path=path).pack()
+        case "action":
+            return AwaitedActionCallback(action=item.id).pack()
 
-option_1_kb = inline_kb(
-    [
-        InlineButton(
-            text="sub option 1",
-            callback_data=MenuCallback(path="option_1.sub_option_1").pack(),
-        ),
-    ]
-)
 
-option_2_kb = inline_kb(
-    [
-        InlineButton(
-            text="sub option 2",
-            callback_data=MenuCallback(path="option_2.sub_option_2").pack(),
-        ),
-    ]
-)
+def build_keyboard(item: MenuItem, path: str) -> t.InlineKeyboardMarkup | None:
+    if not item:
+        return None
+
+    keyboard = inline_kb(
+        [
+            InlineButton(text=c.button_text, callback_data=build_callback(c, path))
+            for c in item.children
+        ],
+    )
+    if not keyboard:
+        return t.InlineKeyboardMarkup(inline_keyboard=[[create_back_button(path)]])
+    if path != MENU.id:
+        keyboard.inline_keyboard.append([create_back_button(path)])
+
+    return keyboard
