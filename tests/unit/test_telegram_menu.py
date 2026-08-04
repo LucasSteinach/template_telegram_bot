@@ -2,8 +2,8 @@ from unittest.mock import ANY, AsyncMock
 
 import pytest
 
-from src.infrastructure.telegram.keyboards.dto import MENU, MenuItem
 from src.infrastructure.telegram.keyboards.menu import get_menu_item, render_menu
+from src.infrastructure.telegram.keyboards.menu_constants import MENU, MenuItem
 
 
 def test_menu_item(menu_item):
@@ -30,4 +30,4 @@ async def test_render_menu(message):
 
     await render_menu(message, "root")
 
-    message.edit_text.assert_called_once_with(text=MENU.message_text, reply_markup=ANY)
+    message.edit_text.assert_awaited_once_with(text=MENU.message_text, reply_markup=ANY)

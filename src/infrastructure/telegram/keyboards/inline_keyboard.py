@@ -3,21 +3,13 @@ from dataclasses import dataclass, fields
 from typing import Literal
 
 import aiogram.types as t
-from aiogram.filters.callback_data import CallbackData
 
-from src.infrastructure.telegram.keyboards.dto import MENU, MenuItem
+from src.infrastructure.telegram.callbacks import AwaitedActionCallback, MenuCallback
+from src.infrastructure.telegram.keyboards.menu_constants import MENU, MenuItem
 
 logger = logging.getLogger(__name__)
 
 BACK_TEXT = "⬅ Back"
-
-
-class AwaitedActionCallback(CallbackData, prefix="action"):
-    action: str
-
-
-class MenuCallback(CallbackData, prefix="menu"):
-    path: str
 
 
 @dataclass

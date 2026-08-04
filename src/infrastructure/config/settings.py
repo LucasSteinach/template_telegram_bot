@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     fsm_storage: str = ""
     redis_url: str | None = None
+    support_user: str | None = None
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env", env_file_encoding="utf-8"
     )

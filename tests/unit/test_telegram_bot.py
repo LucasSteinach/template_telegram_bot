@@ -8,18 +8,17 @@ from src.infrastructure.telegram.middlewares import ContainerMiddleware
 
 
 def test_create_fsm_storage(settings):
-    # none
-    storage = create_fsm_storage(settings)
-
-    assert isinstance(storage, MemoryStorage)
-
     # redis
-    settings.fsm_storage = "redis"
-    settings.redis_url = "redis://localhost:6379"
-
     storage = create_fsm_storage(settings)
 
     assert isinstance(storage, RedisStorage)
+
+    # none
+    settings.fsm_storage = ""
+
+    storage = create_fsm_storage(settings)
+
+    assert isinstance(storage, MemoryStorage)
 
     # incorrect fsm
     settings.fsm_storage = "incorrect data"

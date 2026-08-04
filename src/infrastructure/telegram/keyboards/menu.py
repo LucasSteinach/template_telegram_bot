@@ -2,8 +2,8 @@ import logging
 
 from aiogram.types import Message
 
-from src.infrastructure.telegram.keyboards.dto import MENU, MenuItem
 from src.infrastructure.telegram.keyboards.inline_keyboard import build_keyboard
+from src.infrastructure.telegram.keyboards.menu_constants import MENU, MenuItem
 
 logger = logging.getLogger(__name__)
 

@@ -1,9 +1,7 @@
 from aiogram import Router
 from aiogram.types import CallbackQuery
 
-from src.infrastructure.telegram.keyboards.inline_keyboard import (
-    MenuCallback,
-)
+from src.infrastructure.telegram.callbacks import MenuCallback
 from src.infrastructure.telegram.keyboards.menu import render_menu
 
 router = Router(name="menu")

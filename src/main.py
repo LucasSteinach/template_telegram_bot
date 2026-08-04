@@ -3,7 +3,6 @@ import logging
 
 from src.container import Container
 from src.infrastructure.config.settings import settings
-from src.infrastructure.database.db import async_session_factory
 from src.infrastructure.telegram.bot import (
     create_bot,
     create_dispatcher,
@@ -13,7 +12,7 @@ from src.infrastructure.telegram.bot import (
 async def main() -> None:
     logging.basicConfig(level=settings.log_level)
 
-    container = Container(session_factory=async_session_factory)
+    container = Container(settings)
     bot = create_bot(settings)
     dp = create_dispatcher(container, settings)
 

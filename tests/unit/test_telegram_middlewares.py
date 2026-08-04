@@ -12,9 +12,9 @@ from src.infrastructure.telegram.middlewares.container_middleware import (
 
 
 @pytest.mark.asyncio
-async def test_container_middleware(session):
-    session_factory = MagicMock()
-    container = Container(session_factory=session_factory)
+async def test_container_middleware(session, settings):
+    # session_factory = MagicMock()
+    container = Container(settings)
     middleware = ContainerMiddleware(container)
 
     data = {}
@@ -36,7 +36,7 @@ async def test_callback_lock_middleware(user, message):
     handler = AsyncMock()
     event = AsyncMock()
     event.from_user.id = user.id
-    event.message.message_id = message.id
+    event.message.message_id = message.message_id
     event.answer = AsyncMock()
 
     await middleware(handler, event, data)
@@ -44,7 +44,7 @@ async def test_callback_lock_middleware(user, message):
     assert len(middleware.processing) == 0
     handler.assert_awaited_once_with(event, data)
 
-    middleware.processing.add((user.id, message.id))
+    middleware.processing.add((user.id, message.message_id))
     await middleware(handler, event, data)
 
     assert handler.await_count == 1

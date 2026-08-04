@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Literal
 
+from src.infrastructure.telegram.callbacks import ActionId
+
 
 @dataclass(frozen=True)
 class MenuItem:
@@ -25,7 +27,7 @@ MENU = MenuItem(
     type="menu",
     children=[
         MenuItem(
-            id="input_example",
+            id=ActionId.INPUT_EXAMPLE,
             message_text="What do you want to tell me?",
             button_text="Input example",
             type="action",

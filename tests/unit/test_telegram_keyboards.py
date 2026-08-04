@@ -6,9 +6,11 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
 )
 
+import src.infrastructure.telegram.callbacks
+import src.infrastructure.telegram.handlers.actions
 from src.infrastructure.telegram.keyboards import inline_keyboard as ik
 from src.infrastructure.telegram.keyboards import reply_keyboard as rk
-from src.infrastructure.telegram.keyboards.dto import MENU
+from src.infrastructure.telegram.keyboards.menu_constants import MENU
 
 
 def test_inline_button():
@@ -171,14 +173,22 @@ def test_build_callback():
     item_2 = next(c for c in MENU.children if c.type == "action")
 
     callback = ik.build_callback(item_1, MENU.id)
-    assert callback == ik.MenuCallback(path=item_1.id).pack()
+    assert (
+        callback
+        == src.infrastructure.telegram.callbacks.MenuCallback(path=item_1.id).pack()
+    )
 
     callback = ik.build_callback(item_2, item_2.id)
-    assert callback == ik.AwaitedActionCallback(action=item_2.id).pack()
+    assert (
+        callback
+        == src.infrastructure.telegram.callbacks.AwaitedActionCallback(
+            action=item_2.id
+        ).pack()
+    )
 
 
 def test_build_keyboard():
-    no_item_keyboard = ik.build_keyboard(None, "")  # noqa
+    no_item_keyboard = ik.build_keyboard(None, "")
     assert no_item_keyboard is None
 
     root_keyboard = ik.build_keyboard(MENU, "root")

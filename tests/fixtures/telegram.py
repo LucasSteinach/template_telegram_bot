@@ -1,11 +1,24 @@
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, Mock, MagicMock
 
 import pytest
-from aiogram.types import Chat, Message, User
+from aiogram.types import Chat, User
 
 from src.infrastructure.config.settings import Settings
 from src.infrastructure.telegram import bot as tg_bot
-from src.infrastructure.telegram.keyboards.dto import MenuItem
+from src.infrastructure.telegram.keyboards.menu_constants import MenuItem
+
+
+@pytest.fixture(
+    # autouse=True  to check for warnings' source
+)
+def check_gc():
+    import tracemalloc
+
+    tracemalloc.start(10)
+    yield
+    import gc
+
+    gc.collect()
 
 
 @pytest.fixture
@@ -14,8 +27,9 @@ def settings():
         bot_token="123:test",
         database_url="sqlite+aiosqlite:///:memory:",
         log_level="DEBUG",
-        fsm_storage="",
-        redis_url=None,
+        support_user="12345:@test_support_user",
+        fsm_storage="redis",
+        redis_url="redis://localhost:6379",
     )
 
 
@@ -45,28 +59,25 @@ def chat():
 
 @pytest.fixture
 def message(user, chat):
-    """mock for Message
-    message_id=1,
-    date=d.datetime.now(),
-    chat=chat,
-    from_user=user,
-    """
-    message = AsyncMock(spec=Message)
+    message = Mock()
 
-    message.id = 1
+    message.message_id = 1
+    message.text = "test_text"
     message.from_user = user
     message.chat = chat
+
+    message.answer = AsyncMock()
+    message.edit_text = AsyncMock()
+    message.edit_reply_markup = AsyncMock()
 
     return message
 
 
 @pytest.fixture
 def callback(message):
-    callback = MagicMock()
+    callback = Mock()
     callback.message = message
     callback.answer = AsyncMock()
-    message.edit_text = AsyncMock()
-    message.edit_reply_markup = AsyncMock()
     return callback
 
 
