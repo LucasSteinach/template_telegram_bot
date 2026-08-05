@@ -33,17 +33,25 @@ MENU = MenuItem(
             type="action",
         ),
         MenuItem(
-            id="option_2",
-            message_text="Option 2 menu",
-            button_text="option 2",
+            id="support",
+            message_text="Support menu",
+            button_text="Support",
             type="menu",
             children=[
                 MenuItem(
-                    id="sub_option_2",
-                    message_text="Sub option 2 menu",
-                    button_text="sup option 2",
-                    type="menu",
-                )
+                    id=ActionId.CHAT,
+                    message_text="Chat menu",
+                    button_text="chat",
+                    type="action",
+                    children=[
+                        MenuItem(
+                            id=ActionId.CLOSE_CHAT,
+                            message_text="not a menu part",
+                            button_text="close case",
+                            type="action",
+                        )
+                    ],
+                ),
             ],
         ),
     ],

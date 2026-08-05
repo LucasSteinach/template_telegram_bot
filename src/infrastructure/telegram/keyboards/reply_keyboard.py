@@ -3,6 +3,8 @@ from typing import Literal
 
 import aiogram.types as t
 
+CLOSE_CHAT = "Close chat"
+
 
 @dataclass
 class ReplyButton:
@@ -70,7 +72,7 @@ def create_button(dto: ReplyButton) -> t.KeyboardButton:
 def reply_kb(buttons: list[ReplyButton], **kwargs) -> t.ReplyKeyboardMarkup:
     """
     Creates ReplyKeyboardMarkup.
-    If there are not consecutive row numbers (ex. 1,2,4), telegram removes the gaps automatically
+    If there are non-consecutive row numbers (ex. 1,2,4), telegram removes the gaps automatically
     Must contain at least one ReplyButton
     """
     if len(buttons) == 0:
@@ -83,7 +85,7 @@ def reply_kb(buttons: list[ReplyButton], **kwargs) -> t.ReplyKeyboardMarkup:
     return t.ReplyKeyboardMarkup(
         keyboard=rows,
         is_persistent=kwargs.get("is_persistent"),
-        resize_keyboard=kwargs.get("resize_keyboard"),
+        resize_keyboard=kwargs.get("resize_keyboard") or True,
         one_time_keyboard=kwargs.get("one_time_keyboard"),
         input_field_placeholder=kwargs.get("input_field_placeholder"),
         selective=kwargs.get("selective"),

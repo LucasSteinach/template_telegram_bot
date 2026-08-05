@@ -5,7 +5,7 @@ from aiogram import Dispatcher, Router
 from aiogram.exceptions import TelegramBadRequest
 
 from src.infrastructure.telegram.callbacks import MenuCallback
-from src.infrastructure.telegram.fsm_states import InputDataState
+from src.infrastructure.telegram.fsm_states import InputDataState, SupportState
 from src.infrastructure.telegram.handlers import register_routers
 from src.infrastructure.telegram.handlers.actions.helpers import (
     add_messages_to_cleanup,
@@ -14,6 +14,11 @@ from src.infrastructure.telegram.handlers.actions.helpers import (
 from src.infrastructure.telegram.handlers.actions.input_data import (
     input_data_handler,
     process_input,
+)
+from src.infrastructure.telegram.handlers.actions.support import (
+    close_chat,
+    open_support_chat,
+    process_message,
 )
 from src.infrastructure.telegram.handlers.fallback import delete_unhandled_messages
 from src.infrastructure.telegram.handlers.menu import menu_handler
@@ -100,7 +105,7 @@ async def test_actions_process_input_handler(message):
 
 
 @pytest.mark.asyncio
-async def test_add_messages_to_cleanup():
+async def test_helpers_add_messages_to_cleanup():
     state = AsyncMock()
     state.get_data = AsyncMock(return_value={"cleanup_messages": []})
     state.update_data = AsyncMock()
@@ -113,7 +118,7 @@ async def test_add_messages_to_cleanup():
 
 
 @pytest.mark.asyncio
-async def test_delete_messages(message):
+async def test_helpers_delete_messages(message):
     path = "src.infrastructure.telegram.handlers.actions.helpers"
     message.bot = Mock()
     message.bot.delete_message = AsyncMock()
@@ -132,3 +137,72 @@ async def test_delete_messages(message):
         await delete_messages(message, message_ids)
 
     assert logger_mock.debug.call_count == 3
+
+
+@pytest.mark.asyncio
+async def test_support_open_chat(callback):
+    state = AsyncMock()
+    state.set_state = AsyncMock()
+
+    with (
+        patch(
+            "src.infrastructure.telegram.handlers.actions.support.logger"
+        ) as logger_mock,
+        patch(
+            "src.infrastructure.telegram.handlers.actions.support.add_messages_to_cleanup"
+        ) as add_messages_mock,
+    ):
+        await open_support_chat(callback, state)
+
+    logger_mock.debug.assert_called_once()
+    callback.answer.assert_awaited_once()
+    state.set_state.assert_awaited_once_with(SupportState.chat)
+    callback.message.edit_reply_markup.assert_awaited_once()
+    callback.message.answer.assert_awaited_once()
+    add_messages_mock.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_support_close_chat(message):
+    state = AsyncMock()
+    state.get_data = AsyncMock(return_value={"cleanup_messages": []})
+    state.update_data = AsyncMock()
+    state.clear = AsyncMock()
+
+    with (
+        patch(
+            "src.infrastructure.telegram.handlers.actions.support.logger"
+        ) as logger_mock,
+        patch(
+            "src.infrastructure.telegram.handlers.actions.support.delete_messages"
+        ) as delete_messages_mock,
+        patch(
+            "src.infrastructure.telegram.handlers.actions.support.asyncio.sleep"
+        ) as sleep_mock,
+    ):
+        await close_chat(message, state)
+
+    logger_mock.debug.assert_called_once()
+    assert message.answer.await_count == 2
+    state.get_data.assert_awaited_once()
+    state.clear.assert_awaited_once()
+    sleep_mock.assert_awaited_once()
+    delete_messages_mock.assert_awaited_once_with(message, ANY)
+
+
+@pytest.mark.asyncio
+async def test_support_process_message(message):
+    state = AsyncMock()
+
+    with (
+        patch(
+            "src.infrastructure.telegram.handlers.actions.support.logger"
+        ) as logger_mock,
+        patch(
+            "src.infrastructure.telegram.handlers.actions.support.add_messages_to_cleanup"
+        ) as add_messages_mock,
+    ):
+        await process_message(message, state)
+
+    logger_mock.debug.assert_called_once()
+    add_messages_mock.assert_awaited_once_with(state, [message.message_id])

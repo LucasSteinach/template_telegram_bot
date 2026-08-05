@@ -5,5 +5,5 @@ class InputDataState(StatesGroup):
     waiting_data = State()
 
 
-class OptionTwoState(StatesGroup):
-    root = State()
+class SupportState(StatesGroup):
+    chat = State()
