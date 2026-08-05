@@ -28,7 +28,7 @@ MENU = MenuItem(
     children=[
         MenuItem(
             id=ActionId.INPUT_EXAMPLE,
-            message_text="What do you want to tell me?",
+            message_text="I can repeat whatever you say. Want to test me?",
             button_text="Input example",
             type="action",
         ),

@@ -12,4 +12,4 @@ class AwaitedActionCallback(CallbackData, prefix="action"):
 
 
 class MenuCallback(CallbackData, prefix="menu"):
-    path: str
+    item_id: str

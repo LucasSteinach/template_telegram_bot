@@ -29,9 +29,7 @@ class RedisStorage:
             "message_id": message.message_id,
             "message_text": message.text,
         }
-        logger.debug(
-            "Redis SET %s=%s", self._key(user_id, action), message.model_dump()
-        )
+        logger.debug("Redis SET %s=%s", self._key(user_id, action), json.dumps(data))
         await self.redis.set(
             self._key(user_id, "main_menu"),
             json.dumps(data),

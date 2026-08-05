@@ -10,8 +10,7 @@ from src.application.dto.user_dto import RegisterUser
 from src.container import Container
 from src.infrastructure.telegram.handlers.actions.helpers import delete_messages
 from src.infrastructure.telegram.keyboards.inline_keyboard import build_keyboard
-from src.infrastructure.telegram.keyboards.menu import get_menu_item
-from src.infrastructure.telegram.keyboards.menu_constants import MENU
+from src.infrastructure.telegram.menu.constants import MENU
 
 logger = logging.getLogger(__name__)
 router = Router(name="start")
@@ -32,7 +31,7 @@ async def handle_start(message: Message, container: Container) -> None:
     menu_message = await container.redis_storage.get_main_menu_message_data(
         message.from_user.id
     )
-    keyboard = build_keyboard(get_menu_item("root"), "root")
+    keyboard = build_keyboard(MENU)
     new_message_text = MENU.message_text
 
     if not menu_message:

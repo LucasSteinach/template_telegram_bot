@@ -4,7 +4,7 @@ import pytest
 from aiogram.exceptions import TelegramBadRequest
 
 from src.infrastructure.telegram.handlers.start import handle_start
-from src.infrastructure.telegram.keyboards.menu_constants import MENU
+from src.infrastructure.telegram.menu.constants import MENU
 
 
 @pytest.mark.asyncio

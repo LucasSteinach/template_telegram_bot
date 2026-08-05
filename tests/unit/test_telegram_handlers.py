@@ -37,7 +37,7 @@ def test_handlers_init():
 
 @pytest.mark.asyncio
 async def test_menu_handler(callback):
-    callback_data = MenuCallback(path="root")
+    callback_data = MenuCallback(item_id="root")
     with patch("src.infrastructure.telegram.handlers.menu.render_menu") as mock_render:
         await menu_handler(callback, callback_data)
 

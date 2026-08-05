@@ -1,11 +1,11 @@
-from unittest.mock import AsyncMock, Mock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, Mock
 
 import pytest
 from aiogram.types import Chat, User
 
 from src.infrastructure.config.settings import Settings
 from src.infrastructure.telegram import bot as tg_bot
-from src.infrastructure.telegram.keyboards.menu_constants import MenuItem
+from src.infrastructure.telegram.menu.constants import MenuItem
 
 
 @pytest.fixture(

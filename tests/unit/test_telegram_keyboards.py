@@ -6,11 +6,10 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
 )
 
-import src.infrastructure.telegram.callbacks
-import src.infrastructure.telegram.handlers.actions
+from src.infrastructure.telegram.callbacks import AwaitedActionCallback, MenuCallback
 from src.infrastructure.telegram.keyboards import inline_keyboard as ik
 from src.infrastructure.telegram.keyboards import reply_keyboard as rk
-from src.infrastructure.telegram.keyboards.menu_constants import MENU
+from src.infrastructure.telegram.menu.constants import MENU
 
 
 def test_inline_button():
@@ -151,86 +150,55 @@ def test_reply_keyboard():
 
 
 def test_create_back_button():
-    button_1 = ik.create_back_button("some_path")
-    button_2 = ik.create_back_button("path.subpath")
+    back_button_for_root = ik.create_back_button(MENU.id)
 
-    assert isinstance(button_1, InlineKeyboardButton)
-    assert isinstance(button_2, InlineKeyboardButton)
-    assert button_1.callback_data == "menu:root"
-    assert button_2.callback_data == "menu:path"
+    assert back_button_for_root is None
+
+    back_button = ik.create_back_button(MENU.children[0].id)
+
+    assert isinstance(back_button, InlineKeyboardButton)
+    assert back_button.callback_data == MenuCallback(item_id=MENU.id).pack()
 
 
 def test_has_button():
-    kb = ik.build_keyboard(MENU, "root")
+    kb = ik.build_keyboard(MENU)
     assert ik.has_button(kb, next(c.button_text for c in MENU.children))
     assert not ik.has_button(kb, "incorrect_text")
 
 
 def test_build_callback():
-    # MenuItem(type="menu")
-    item_1 = next(c for c in MENU.children if c.type == "menu")
-    # MenuItem(type="action")
-    item_2 = next(c for c in MENU.children if c.type == "action")
+    # menu
+    menu_type_item = next(c for c in MENU.children if c.type == "menu")
 
-    callback = ik.build_callback(item_1, MENU.id)
-    assert (
-        callback
-        == src.infrastructure.telegram.callbacks.MenuCallback(path=item_1.id).pack()
-    )
+    callback = ik.build_callback(menu_type_item)
 
-    callback = ik.build_callback(item_2, item_2.id)
-    assert (
-        callback
-        == src.infrastructure.telegram.callbacks.AwaitedActionCallback(
-            action=item_2.id
-        ).pack()
-    )
+    assert callback == MenuCallback(item_id=menu_type_item.id).pack()
+
+    # action
+    action_type_item = next(c for c in MENU.children if c.type == "action")
+
+    callback = ik.build_callback(action_type_item)
+    assert callback == AwaitedActionCallback(action=action_type_item.id).pack()
 
 
 def test_build_keyboard():
-    no_item_keyboard = ik.build_keyboard(None, "")
+    no_item_keyboard = ik.build_keyboard(None)
+
     assert no_item_keyboard is None
 
-    root_keyboard = ik.build_keyboard(MENU, "root")
-    assert (
-        next(
-            (
-                b
-                for row in root_keyboard.inline_keyboard
-                for b in row
-                if b.text == ik.BACK_TEXT
-            ),
-            None,
-        )
-        is None
-    )
+    root_keyboard = ik.build_keyboard(MENU)
 
-    item_with_no_keyboard = next(c for c in MENU.children if len(c.children) == 0)
-    keyboard = ik.build_keyboard(item_with_no_keyboard, item_with_no_keyboard.id)
-    assert (
-        next(
-            (
-                b
-                for row in keyboard.inline_keyboard
-                for b in row
-                if b.text == ik.BACK_TEXT
-            ),
-            None,
-        )
-        is not None
-    )
+    assert ik.has_button(root_keyboard, MENU.children[0].button_text)
+    assert not ik.has_button(root_keyboard, ik.BACK_TEXT)
 
-    not_root_item = next(c for c in MENU.children if len(c.children) != 0)
-    keyboard = ik.build_keyboard(not_root_item, not_root_item.id)
+    item_with_no_children = next(c for c in MENU.children if len(c.children) == 0)
+    keyboard = ik.build_keyboard(item_with_no_children)
+
+    assert ik.has_button(keyboard, ik.BACK_TEXT)
+
+    not_root_item_with_children = next(c for c in MENU.children if len(c.children) != 0)
+    keyboard = ik.build_keyboard(not_root_item_with_children)
+
     assert (
-        next(
-            (
-                b
-                for row in keyboard.inline_keyboard
-                for b in row
-                if b.text == ik.BACK_TEXT
-            ),
-            None,
-        )
-        is not None
+        len(keyboard.inline_keyboard) == len(not_root_item_with_children.children) + 1
     )

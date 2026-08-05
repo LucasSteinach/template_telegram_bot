@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.types import CallbackQuery
 
 from src.infrastructure.telegram.callbacks import MenuCallback
-from src.infrastructure.telegram.keyboards.menu import render_menu
+from src.infrastructure.telegram.menu.menu import render_menu
 
 router = Router(name="menu")
 
@@ -15,5 +15,5 @@ async def menu_handler(
     await callback.answer()
     await render_menu(
         callback.message,
-        callback_data.path,
+        callback_data.item_id,
     )

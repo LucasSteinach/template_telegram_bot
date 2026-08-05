@@ -12,11 +12,11 @@ from src.infrastructure.telegram.handlers.actions.helpers import (
     delete_messages,
 )
 from src.infrastructure.telegram.keyboards.inline_keyboard import build_keyboard
-from src.infrastructure.telegram.keyboards.menu_constants import MENU
+from src.infrastructure.telegram.menu.constants import MENU
 
 logger = logging.getLogger(__name__)
 
-router = Router()
+router = Router(name="input_data")
 
 
 @router.callback_query(AwaitedActionCallback.filter(F.action == ActionId.INPUT_EXAMPLE))
@@ -52,6 +52,6 @@ async def process_input(
 
     await message.answer(
         "Main menu",
-        reply_markup=build_keyboard(MENU, "root"),
+        reply_markup=build_keyboard(MENU),
     )
     await delete_messages(message, messages)

@@ -5,7 +5,8 @@ from typing import Literal
 import aiogram.types as t
 
 from src.infrastructure.telegram.callbacks import AwaitedActionCallback, MenuCallback
-from src.infrastructure.telegram.keyboards.menu_constants import MENU, MenuItem
+from src.infrastructure.telegram.menu.constants import MENU, MenuItem
+from src.infrastructure.telegram.menu.helpers import get_path_to_item
 
 logger = logging.getLogger(__name__)
 
@@ -75,13 +76,13 @@ def create_button(dto: InlineButton) -> t.InlineKeyboardButton:
     )
 
 
-def create_back_button(path: str) -> t.InlineKeyboardButton:
-    return t.InlineKeyboardButton(
-        text=BACK_TEXT,
-        callback_data=MenuCallback(
-            path=".".join(path.split(".")[:-1]) or "root"
-        ).pack(),
-    )
+def create_back_button(item_id: str) -> t.InlineKeyboardButton:
+    if item_id != MENU.id:
+        parent_id = get_path_to_item(item_id).split(".")[-2]
+        return t.InlineKeyboardButton(
+            text=BACK_TEXT,
+            callback_data=MenuCallback(item_id=parent_id).pack(),
+        )
 
 
 def has_button(
@@ -107,35 +108,28 @@ def inline_kb(buttons: list[InlineButton], **kwargs) -> t.InlineKeyboardMarkup |
     )
 
 
-def build_callback(item: MenuItem, menu_path: str) -> str:
-    """
-    Build callback data for a menu item.
-    Args:
-        item: Menu item for which the callback is created.
-        menu_path: Path to the item without the root id,
-            e.g. option_1.sub_option_1.<item_id>.
-    """
+def build_callback(item: MenuItem) -> str:
     match item.type:
         case "menu":
-            path = item.id if menu_path == MENU.id else f"{menu_path}.{item.id}"
-            return MenuCallback(path=path).pack()
+            return MenuCallback(item_id=item.id).pack()
         case "action":
             return AwaitedActionCallback(action=item.id).pack()
 
 
-def build_keyboard(item: MenuItem, path: str) -> t.InlineKeyboardMarkup | None:
+def build_keyboard(item: MenuItem | None) -> t.InlineKeyboardMarkup | None:
     if not item:
         return None
 
     keyboard = inline_kb(
         [
-            InlineButton(text=c.button_text, callback_data=build_callback(c, path))
+            InlineButton(text=c.button_text, callback_data=build_callback(c))
             for c in item.children
         ],
     )
+
     if not keyboard:
-        return t.InlineKeyboardMarkup(inline_keyboard=[[create_back_button(path)]])
-    if path != MENU.id:
-        keyboard.inline_keyboard.append([create_back_button(path)])
+        return t.InlineKeyboardMarkup(inline_keyboard=[[create_back_button(item.id)]])
+    if item.id != MENU.id:
+        keyboard.inline_keyboard.append([create_back_button(item.id)])
 
     return keyboard
