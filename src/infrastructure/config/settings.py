@@ -7,7 +7,11 @@ BASE_DIR = Path(__file__).resolve().parents[3]
 
 class Settings(BaseSettings):
     bot_token: str
-    database_url: str
+    db_user: str
+    db_password: str
+    db_host: str
+    db_port: str = "5432"
+    db_name: str
     log_level: str = "INFO"
     fsm_storage: str = ""
     redis_url: str | None = None

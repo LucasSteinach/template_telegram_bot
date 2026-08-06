@@ -2,8 +2,6 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
-
-# from aiogram.fsm.storage.mongo import MongoStorage
 from aiogram.fsm.storage.redis import RedisStorage
 
 from src.container import Container
@@ -24,8 +22,6 @@ def create_fsm_storage(settings: Settings):
         return MemoryStorage()
     if settings.fsm_storage == "redis":
         return RedisStorage.from_url(settings.redis_url)
-    # if settings.fsm_storage == "mongodb":
-    #     return MongoStorage.from_url(settings.mongo_url)
     return MemoryStorage()
 
 

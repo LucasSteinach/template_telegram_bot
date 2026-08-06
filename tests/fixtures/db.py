@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.pool import StaticPool
 
-from src.infrastructure.database.models import Base
+from src.infrastructure.database.models import BaseModel
 
 
 @pytest.fixture
@@ -31,7 +31,7 @@ def session_factory(engine):
 @pytest_asyncio.fixture
 async def session(engine, session_factory):
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(BaseModel.metadata.create_all)
 
     async with session_factory() as session:
         yield session
