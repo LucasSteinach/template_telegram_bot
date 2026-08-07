@@ -25,8 +25,8 @@ async def handle_start(message: Message, container: Container) -> None:
     )
 
     async with container.session_factory() as session:
-        use_case = container.register_user_use_case(session)
-        user = await use_case.execute(dto)
+        uc = container.user_uc(session)
+        user = await uc.register_user(dto)
 
     menu_message = await container.redis_storage.get_main_menu_message_data(
         message.from_user.id

@@ -2,14 +2,14 @@ from datetime import datetime, timezone
 
 from src.application.dto.user_dto import RegisterUser
 from src.domain.entities.user import User
-from src.domain.repositories.user_repository import UserRepository
+from src.infrastructure.database.repositories.user_repository import UserRepository
 
 
-class RegisterUserUseCase:
+class UserUseCase:
     def __init__(self, user_repository: UserRepository) -> None:
         self._user_repository = user_repository
 
-    async def execute(self, dto: RegisterUser) -> User:
+    async def register_user(self, dto: RegisterUser) -> User:
         exist = await self._user_repository.get_by_telegram_id(dto.telegram_id)
         if exist:
             return exist
@@ -20,5 +20,12 @@ class RegisterUserUseCase:
             full_name=dto.full_name,
             created_at=datetime.now(timezone.utc),
         )
-        await self._user_repository.save(user)
+        await self._user_repository.save_user(user)
         return user
+
+    async def get_user(self, user_id: int) -> User | None:
+        exist = await self._user_repository.get_by_telegram_id(user_id)
+        if not exist:
+            return None
+
+        return exist
