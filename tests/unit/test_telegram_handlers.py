@@ -1,9 +1,10 @@
-from unittest.mock import ANY, AsyncMock, Mock, patch
+from unittest.mock import ANY, AsyncMock, MagicMock, Mock, patch
 
 import pytest
 from aiogram import Dispatcher, Router
 from aiogram.exceptions import TelegramBadRequest
 
+from src.domain.entities.support_chat import ChatStatus
 from src.infrastructure.telegram.callbacks import MenuCallback
 from src.infrastructure.telegram.fsm_states import InputDataState, SupportState
 from src.infrastructure.telegram.handlers import register_routers
@@ -81,7 +82,7 @@ async def test_actions_input_data_handler(callback):
 
 
 @pytest.mark.asyncio
-async def test_actions_process_input_handler(message):
+async def test_actions_process_input_handler(container, message):
     path = "src.infrastructure.telegram.handlers.actions.input_data"
     state = AsyncMock()
     state.get_data = AsyncMock(return_value={"cleanup_messages": []})
@@ -140,69 +141,124 @@ async def test_helpers_delete_messages(message):
 
 
 @pytest.mark.asyncio
-async def test_support_open_chat(callback):
+async def test_support_open_chat(callback, container):
+    path = "src.infrastructure.telegram.handlers.actions.support"
+    support_chat_id = 1
+
     state = AsyncMock()
     state.set_state = AsyncMock()
+    state.update_data = AsyncMock()
+
+    container.support_chat_uc = MagicMock()
+    container.support_chat_uc.return_value.create_chat = AsyncMock()
+    container.support_chat_uc.return_value.create_chat.return_value.id = support_chat_id
 
     with (
-        patch(
-            "src.infrastructure.telegram.handlers.actions.support.logger"
-        ) as logger_mock,
-        patch(
-            "src.infrastructure.telegram.handlers.actions.support.add_messages_to_cleanup"
-        ) as add_messages_mock,
+        patch(f"{path}.logger") as logger_mock,
+        patch(f"{path}.add_messages_to_cleanup") as add_messages_mock,
     ):
-        await open_support_chat(callback, state)
+        await open_support_chat(callback, state, container)
 
     logger_mock.debug.assert_called_once()
     callback.answer.assert_awaited_once()
+
     state.set_state.assert_awaited_once_with(SupportState.chat)
+    state.update_data.assert_awaited_once()
+
+    container.support_chat_uc.return_value.create_chat.assert_awaited_once()
+
     callback.message.edit_reply_markup.assert_awaited_once()
     callback.message.answer.assert_awaited_once()
     add_messages_mock.assert_awaited_once()
 
 
 @pytest.mark.asyncio
-async def test_support_close_chat(message):
+async def test_support_close_chat(container, message):
+    path = "src.infrastructure.telegram.handlers.actions.support"
+    support_chat_id = 1
+
     state = AsyncMock()
-    state.get_data = AsyncMock(return_value={"cleanup_messages": []})
+    state.get_state = AsyncMock()
+    state.get_data = AsyncMock(
+        return_value={"cleanup_messages": [], "support_chat_id": support_chat_id}
+    )
     state.update_data = AsyncMock()
     state.clear = AsyncMock()
 
+    container.user_uc = MagicMock()
+    container.user_uc.return_value.get_user = AsyncMock()
+
+    container.support_chat_uc = MagicMock()
+    container.support_chat_uc.return_value.close_chat = AsyncMock()
+
     with (
-        patch(
-            "src.infrastructure.telegram.handlers.actions.support.logger"
-        ) as logger_mock,
-        patch(
-            "src.infrastructure.telegram.handlers.actions.support.delete_messages"
-        ) as delete_messages_mock,
-        patch(
-            "src.infrastructure.telegram.handlers.actions.support.asyncio.sleep"
-        ) as sleep_mock,
+        patch(f"{path}.logger") as logger_mock,
+        patch(f"{path}.delete_messages") as delete_messages_mock,
+        patch(f"{path}.asyncio.sleep") as sleep_mock,
     ):
-        await close_chat(message, state)
+        await close_chat(message, state, container)
 
     logger_mock.debug.assert_called_once()
-    assert message.answer.await_count == 2
+    state.get_state.assert_awaited_once()
     state.get_data.assert_awaited_once()
+
+    container.user_uc.return_value.get_user.assert_awaited_once()
+    container.support_chat_uc.return_value.close_chat.assert_awaited_once()
+
+    assert message.answer.await_count == 2
     state.clear.assert_awaited_once()
     sleep_mock.assert_awaited_once()
     delete_messages_mock.assert_awaited_once_with(message, ANY)
 
 
 @pytest.mark.asyncio
-async def test_support_process_message(message):
+async def test_support_process_message(container, message, user):
+    path = "src.infrastructure.telegram.handlers.actions.support"
+    support_chat_id = 1
+
     state = AsyncMock()
+    state.get_data = AsyncMock(return_value={"support_chat_id": support_chat_id})
+
+    container.user_uc = MagicMock()
+    container.user_uc.return_value.get_user = AsyncMock(return_value=user)
+
+    support_chat = MagicMock()
+    support_chat.status = ChatStatus.CREATED
+    support_chat.waiting = MagicMock()
+
+    container.support_chat_uc = MagicMock()
+    container.support_chat_uc.return_value.get_chat = AsyncMock(
+        return_value=support_chat
+    )
+    container.support_chat_uc.return_value.save_chat = AsyncMock()
+
+    container.support_message_uc = MagicMock()
+    container.support_message_uc.return_value.save_message = AsyncMock()
 
     with (
-        patch(
-            "src.infrastructure.telegram.handlers.actions.support.logger"
-        ) as logger_mock,
-        patch(
-            "src.infrastructure.telegram.handlers.actions.support.add_messages_to_cleanup"
-        ) as add_messages_mock,
+        patch(f"{path}.logger") as logger_mock,
+        patch(f"{path}.add_messages_to_cleanup") as add_messages_mock,
     ):
-        await process_message(message, state)
+        await process_message(message, state, container)
 
     logger_mock.debug.assert_called_once()
+    state.get_data.assert_awaited_once()
+
+    container.user_uc.assert_called_once()
+    container.user_uc.return_value.get_user.assert_awaited_once_with(
+        message.from_user.id
+    )
+
+    container.support_chat_uc.assert_called_once()
+    container.support_chat_uc.return_value.get_chat.assert_awaited_once_with(
+        support_chat_id
+    )
+    container.support_chat_uc.return_value.save_chat.assert_awaited_once()
+
+    container.support_message_uc.assert_called_once()
+    container.support_message_uc.return_value.save_message.assert_awaited_once()
+
+    assert support_chat.topic == message.text
+    support_chat.waiting.assert_called_once()
+
     add_messages_mock.assert_awaited_once_with(state, [message.message_id])

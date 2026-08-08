@@ -1,8 +1,11 @@
+from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock, Mock
 
 import pytest
-from aiogram.types import Chat, User
+from aiogram.types import Chat
+from aiogram.types import User as TelegramUser
 
+from src.domain.entities.user import User, UserRole
 from src.infrastructure.config.settings import Settings
 from src.infrastructure.telegram import bot as tg_bot
 from src.infrastructure.telegram.menu.constants import MenuItem
@@ -25,7 +28,11 @@ def check_gc():
 def settings():
     return Settings(
         bot_token="123:test",
-        database_url="sqlite+aiosqlite:///:memory:",
+        db_user="db_user",
+        db_password="db_password",
+        db_host="db_host",
+        db_port="db_port",
+        db_name="db_name",
         log_level="DEBUG",
         support_user="12345:@test_support_user",
         fsm_storage="redis",
@@ -43,9 +50,25 @@ def bot(settings):
 
 
 @pytest.fixture
+def telegram_user():
+    return TelegramUser(
+        id=123,
+        is_bot=False,
+        first_name="Test",
+        last_name="User",
+        username="Test User",
+        role=UserRole.USER,
+    )
+
+
+@pytest.fixture
 def user():
     return User(
-        id=123, is_bot=False, first_name="User", last_name="Name", username="Test User"
+        telegram_id=123,
+        username="Test User",
+        full_name="Fullname Test User",
+        created_at=datetime(2025, 8, 12, tzinfo=timezone.utc),
+        role=UserRole.USER,
     )
 
 
@@ -58,12 +81,12 @@ def chat():
 
 
 @pytest.fixture
-def message(user, chat):
+def message(telegram_user, chat):
     message = Mock()
 
     message.message_id = 1
     message.text = "test_text"
-    message.from_user = user
+    message.from_user = telegram_user
     message.chat = chat
 
     message.answer = AsyncMock()

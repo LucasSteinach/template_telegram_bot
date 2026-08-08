@@ -47,7 +47,7 @@ class SupportChat:
             return
         if user_id == self.user_id:
             self._close_by_user()
-        elif self.operator_id == user_id or role != UserRole.USER:
+        elif self.operator_id == user_id or role == UserRole.ADMIN:
             self._close_by_operator(user_id, role)
 
         self.status = ChatStatus.CLOSED

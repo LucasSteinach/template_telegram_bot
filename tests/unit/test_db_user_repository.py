@@ -4,13 +4,13 @@ import pytest
 
 from src.domain.entities.user import User
 from src.infrastructure.database.repositories.user_repository import (
-    SqlAlchemyUserRepository,
+    UserRepository,
 )
 
 
 @pytest.mark.asyncio
 async def test_db_user_repository(session):
-    repository = SqlAlchemyUserRepository(session)
+    repository = UserRepository(session)
 
     no_user = await repository.get_by_telegram_id(-1)
     assert no_user is None
@@ -22,7 +22,7 @@ async def test_db_user_repository(session):
         created_at=d.datetime.now(tz=d.UTC),
     )
 
-    await repository.save(user)
+    await repository.save_user(user)
 
     user_exist = (await repository.get_by_telegram_id(user.telegram_id)) is not None
     assert user_exist

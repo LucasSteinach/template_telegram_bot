@@ -49,8 +49,6 @@ class SupportMessageRepository(BaseSupportMessageRepository):
             select(Instance).where(Instance.chat_id == chat_id)
         )
         instances = result.scalars().all()
-        if instances is None:
-            return []
 
         return [self.instance_to_entity(instance) for instance in instances]
 

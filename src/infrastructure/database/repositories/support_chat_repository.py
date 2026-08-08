@@ -58,8 +58,6 @@ class SupportChatRepository(BaseSupportChatRepository):
         )
         instances = result.scalars().all()
 
-        if instances is None:
-            return []
         return [self.instance_to_entity(instance) for instance in instances]
 
     async def get_chats_by_user(self, user_id: int) -> list[Entity]:
@@ -72,8 +70,6 @@ class SupportChatRepository(BaseSupportChatRepository):
         )
         instances = result.scalars().all()
 
-        if instances is None:
-            return []
         return [self.instance_to_entity(instance) for instance in instances]
 
     async def get_closed_chats(self) -> list[Entity]:
@@ -86,8 +82,6 @@ class SupportChatRepository(BaseSupportChatRepository):
         )
         instances = result.scalars().all()
 
-        if instances is None:
-            return []
         return [self.instance_to_entity(instance) for instance in instances]
 
     async def persist(self, entity: Entity) -> Entity:

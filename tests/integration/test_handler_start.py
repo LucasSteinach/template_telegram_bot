@@ -9,7 +9,7 @@ from src.infrastructure.telegram.menu.constants import MENU
 
 @pytest.mark.asyncio
 async def test_handler_start_first_time(
-    container, session, session_factory, message, user
+    container, session, session_factory, message, telegram_user
 ):
     message.answer = AsyncMock()
     container.redis_storage.get_main_menu_message_data = AsyncMock(return_value={})
@@ -23,7 +23,7 @@ async def test_handler_start_first_time(
 
     delete_mock.assert_awaited_once_with(message, [message.message_id])
     message.answer.assert_awaited_once_with(
-        f"Hi, {user.full_name}!",
+        f"Hi, {telegram_user.full_name}!",
         reply_markup=ANY,
     )
     container.redis_storage.set_main_menu_message_data.assert_awaited_once()
@@ -31,7 +31,7 @@ async def test_handler_start_first_time(
 
 @pytest.mark.asyncio
 async def test_handler_start_menu_exists(
-    container, session, session_factory, message, user
+    container, session, session_factory, message, telegram_user
 ):
     message.answer = AsyncMock()
     container.redis_storage.get_main_menu_message_data = AsyncMock(
@@ -59,7 +59,7 @@ async def test_handler_start_menu_exists(
 
 @pytest.mark.asyncio
 async def test_handler_start_different_menu_messages(
-    container, session, session_factory, message, user
+    container, session, session_factory, message, telegram_user
 ):
     message.answer = AsyncMock()
     message.bot = AsyncMock()
@@ -88,7 +88,7 @@ async def test_handler_start_different_menu_messages(
 
 @pytest.mark.asyncio
 async def test_handler_start_bad_request(
-    container, session, session_factory, message, user
+    container, session, session_factory, message, telegram_user
 ):
     container.redis_storage.get_main_menu_message_data = AsyncMock(
         return_value={

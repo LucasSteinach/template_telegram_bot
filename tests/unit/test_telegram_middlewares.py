@@ -28,14 +28,14 @@ async def test_container_middleware(session, settings):
 
 
 @pytest.mark.asyncio
-async def test_callback_lock_middleware(user, message):
+async def test_callback_lock_middleware(telegram_user, message):
     middleware = CallbackLockMiddleware()
     assert len(middleware.processing) == 0
 
     data = {}
     handler = AsyncMock()
     event = AsyncMock()
-    event.from_user.id = user.id
+    event.from_user.id = telegram_user.id
     event.message.message_id = message.message_id
     event.answer = AsyncMock()
 
@@ -44,7 +44,7 @@ async def test_callback_lock_middleware(user, message):
     assert len(middleware.processing) == 0
     handler.assert_awaited_once_with(event, data)
 
-    middleware.processing.add((user.id, message.message_id))
+    middleware.processing.add((telegram_user.id, message.message_id))
     await middleware(handler, event, data)
 
     assert handler.await_count == 1

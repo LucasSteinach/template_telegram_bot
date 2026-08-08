@@ -6,10 +6,10 @@ from src.infrastructure.redis.helpers import generate_message_hash
 
 
 @pytest.mark.asyncio
-async def test_storage_main_menu_message_data(redis_storage, message, user):
+async def test_storage_main_menu_message_data(redis_storage, message, telegram_user):
     with patch("src.infrastructure.redis.storage.logger") as logger_mock:
-        await redis_storage.set_main_menu_message_data(user.id, message)
-        data = await redis_storage.get_main_menu_message_data(user.id)
+        await redis_storage.set_main_menu_message_data(telegram_user.id, message)
+        data = await redis_storage.get_main_menu_message_data(telegram_user.id)
 
     assert logger_mock.debug.call_count == 2
     assert isinstance(data, dict)

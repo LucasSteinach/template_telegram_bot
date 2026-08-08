@@ -24,9 +24,9 @@ class SupportChatUseCase:
             )
         )
 
-    async def close_chat(self, chat_id: int, user: User):
+    async def close_chat(self, chat_id: int, user: User) -> SupportChat | None:
         if user is None:
-            logger.error(f"User not exist: {user}")
+            logger.error("User not exist")
             return
         chat = await self._support_chat_repository.get_chat(chat_id)
         chat.close(user.telegram_id, user.role)

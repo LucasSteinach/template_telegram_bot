@@ -66,7 +66,9 @@ async def close_chat(
         f"____________________current state: {await state.get_state()}____________________"
     )
 
-    support_chat_id = (await state.get_data()).get("support_chat_id")
+    data = await state.get_data()
+    support_chat_id = data.get("support_chat_id")
+    messages = data.get("cleanup_messages")
 
     async with container.session_factory() as session:
         user = await container.user_uc(session).get_user(message.from_user.id)
@@ -77,7 +79,6 @@ async def close_chat(
         reply_markup=ReplyKeyboardRemove(),
     )
 
-    messages = (await state.get_data()).get("cleanup_messages")
     await state.clear()
     await asyncio.sleep(5)
 
@@ -104,9 +105,11 @@ async def process_message(
     support_chat_id = (await state.get_data()).get("support_chat_id")
 
     async with container.session_factory() as session:
+        user_uc = container.user_uc(session)
         support_chat_uc = container.support_chat_uc(session)
         support_message_uc = container.support_message_uc(session)
-        user = await container.user_uc(session).get_user(message.from_user.id)
+
+        user = await user_uc.get_user(message.from_user.id)
         support_chat = await support_chat_uc.get_chat(support_chat_id)
         support_chat.last_activity_at = datetime.now(tz=timezone.utc)
 
@@ -118,9 +121,6 @@ async def process_message(
             support_chat.topic = truncate(message.text)
             support_chat.waiting()
 
-        # if support_chat.status == "waiting" and user.role != "user":
-        #     await chat.set_status("active")
-        #     await chat.assign_operator
         await support_chat_uc.save_chat(support_chat)
 
     await add_messages_to_cleanup(state, [message.message_id])
