@@ -1,33 +1,19 @@
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.domain.entities.support_chat import ChatStatus
-from src.domain.entities.support_chat import SupportChat as Entity
-from src.domain.repositories.support_chat_repository import BaseSupportChatRepository
-from src.infrastructure.database.models import SupportChatModel as Instance
+from src.domain.entities.support_chat import ChatStatus, SupportChat
+from src.infrastructure.database.models import SupportChatModel
+from src.infrastructure.database.repositories.base_repository import AsyncBaseRepository
 
 
-class SupportChatRepository(BaseSupportChatRepository):
+class SupportChatRepository(AsyncBaseRepository[SupportChatModel, SupportChat, int]):
+    _instance = SupportChatModel
+    _entity = SupportChat
+
     def __init__(self, session: AsyncSession) -> None:
-        self._session = session
+        super().__init__(session)
 
-    @staticmethod
-    def entity_to_instance(entity: Entity) -> Instance:
-        return Instance(
-            id=entity.id,
-            topic=entity.topic,
-            user_id=entity.user_id,
-            operator_id=entity.operator_id,
-            status=entity.status,
-            created_at=entity.created_at,
-            last_activity_at=entity.last_activity_at,
-            closed_at=entity.closed_at,
-            closed_by=entity.closed_by,
-        )
-
-    @staticmethod
-    def instance_to_entity(instance: Instance) -> Entity:
-        return Entity(
+    def instance_to_entity(self, instance: SupportChatModel) -> SupportChat:
+        return SupportChat(
             id=instance.id,
             topic=instance.topic,
             user_id=instance.user_id,
@@ -39,57 +25,39 @@ class SupportChatRepository(BaseSupportChatRepository):
             closed_by=instance.closed_by,
         )
 
-    async def get_chat(self, chat_id: int) -> Entity | None:
-        result = await self._session.execute(
-            select(Instance).where(Instance.id == chat_id)
+    def entity_to_instance(self, entity: SupportChat) -> SupportChatModel:
+        return SupportChatModel(
+            id=entity.id,
+            topic=entity.topic,
+            user_id=entity.user_id,
+            operator_id=entity.operator_id,
+            status=entity.status,
+            created_at=entity.created_at,
+            last_activity_at=entity.last_activity_at,
+            closed_at=entity.closed_at,
+            closed_by=entity.closed_by,
         )
-        instance = result.scalar_one_or_none()
-        if instance is None:
-            return None
-        return self.instance_to_entity(instance)
 
-    async def get_active_chats(self) -> list[Entity]:
-        result = await self._session.execute(
-            select(Instance)
-            .where(
-                Instance.status != ChatStatus.CLOSED,
-            )
-            .order_by(~Instance.last_activity_at)
+    async def get_all_active_chats(self) -> list[SupportChat]:
+        result = await self.find_all(
+            where=[
+                SupportChatModel.status != ChatStatus.CLOSED,
+            ]
         )
-        instances = result.scalars().all()
+        return result.items
 
-        return [self.instance_to_entity(instance) for instance in instances]
-
-    async def get_chats_by_user(self, user_id: int) -> list[Entity]:
-        result = await self._session.execute(
-            select(Instance)
-            .where(
-                Instance.user_id == user_id,
-            )
-            .order_by(Instance.last_activity_at)
+    async def get_all_by_user_id(self, user_id: int) -> list[SupportChat]:
+        result = await self.find_all(
+            where=[
+                SupportChatModel.user_id == user_id,
+            ]
         )
-        instances = result.scalars().all()
+        return result.items
 
-        return [self.instance_to_entity(instance) for instance in instances]
-
-    async def get_closed_chats(self) -> list[Entity]:
-        result = await self._session.execute(
-            select(Instance)
-            .where(
-                Instance.status == ChatStatus.CLOSED,
-            )
-            .order_by(Instance.last_activity_at)
+    async def get_all_closed_chats(self) -> list[SupportChat]:
+        result = await self.find_all(
+            where=[
+                SupportChatModel.status == ChatStatus.CLOSED,
+            ]
         )
-        instances = result.scalars().all()
-
-        return [self.instance_to_entity(instance) for instance in instances]
-
-    async def persist(self, entity: Entity) -> Entity:
-        instance = self.entity_to_instance(entity)
-
-        merged = await self._session.merge(instance)
-
-        await self._session.commit()
-        await self._session.refresh(merged)
-
-        return self.instance_to_entity(merged)
+        return result.items

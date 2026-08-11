@@ -14,7 +14,7 @@ class BaseModel(DeclarativeBase):
 class UserModel(BaseModel):
     __tablename__ = "users"
 
-    telegram_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     username: Mapped[str | None] = mapped_column(String(64), nullable=True)
     role: Mapped[UserRole] = mapped_column(String(64), nullable=False, default="user")
     full_name: Mapped[str] = mapped_column(String(256))

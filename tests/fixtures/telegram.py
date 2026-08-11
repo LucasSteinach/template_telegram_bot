@@ -64,7 +64,7 @@ def telegram_user():
 @pytest.fixture
 def user():
     return User(
-        telegram_id=123,
+        id=123,
         username="Test User",
         full_name="Fullname Test User",
         created_at=datetime(2025, 8, 12, tzinfo=timezone.utc),

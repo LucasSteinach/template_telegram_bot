@@ -4,19 +4,16 @@ import pytest
 
 from src.application.use_cases.support_message_use_case import SupportMessageUseCase
 from src.domain.entities.support_message import SupportMessage
-from src.domain.repositories.support_message_repository import (
-    BaseSupportMessageRepository,
-)
 
 
-class FakeSupportMessageRepository(BaseSupportMessageRepository):
+class FakeSupportMessageRepository:
     def __init__(self) -> None:
         self.storage: dict[int, SupportMessage] = {}
 
-    async def get_message(self, message_id: int) -> SupportMessage | None:
+    async def find_by_id(self, message_id: int) -> SupportMessage | None:
         return self.storage.get(message_id)
 
-    async def get_messages_by_chat(self, chat_id: int) -> list[SupportMessage]:
+    async def get_all_by_chat_id(self, chat_id: int) -> list[SupportMessage]:
         return [
             message for _, message in self.storage.items() if message.chat_id == chat_id
         ]

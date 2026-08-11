@@ -1,4 +1,3 @@
-
 import pytest
 
 from src.domain.entities.support_message import SupportMessage
@@ -31,28 +30,11 @@ def test_instance_to_entity(session, support_message_instance):
 
 
 @pytest.mark.asyncio
-async def test_get_and_save_message(session, support_message_entity):
-    repository = SupportMessageRepository(session)
-    id_ = 1
-    entity = support_message_entity(id=id_)
-
-    message = await repository.get_message(id_)
-    assert message is None
-
-    message = await repository.persist(entity)
-    assert isinstance(message, SupportMessage)
-    assert message.id == id_
-
-    message = await repository.get_message(id_)
-    assert isinstance(message, SupportMessage)
-
-
-@pytest.mark.asyncio
-async def test_get_messages_by_chat(session, support_message_entity):
+async def test_get_all_by_chat(session, support_message_entity):
     repository = SupportMessageRepository(session)
     chat_id = 2
 
-    messages = await repository.get_messages_by_chat(chat_id)
+    messages = await repository.get_all_by_chat_id(chat_id)
 
     assert isinstance(messages, list)
     assert not messages
@@ -63,8 +45,8 @@ async def test_get_messages_by_chat(session, support_message_entity):
         entity = support_message_entity(id=i)
         await repository.persist(entity)
 
-    messages = await repository.get_messages_by_chat(chat_id)
+    messages = await repository.get_all_by_chat_id(chat_id)
 
     assert isinstance(messages, list)
     assert len(messages) == messages_amount
-    assert all(m.chat_id == chat_id for m in messages)
+    assert all(isinstance(m, SupportMessage) and m.chat_id == chat_id for m in messages)

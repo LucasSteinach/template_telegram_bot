@@ -29,7 +29,9 @@ def test_create_fsm_storage(settings):
 
 
 @pytest.mark.asyncio
-async def test_bot(bot, container, session, session_factory, settings, message, telegram_user):
+async def test_bot(
+    bot, container, session, session_factory, settings, message, telegram_user
+):
     dispatcher = b.create_dispatcher(container, settings)
     middlewares = dispatcher.update.outer_middleware._middlewares
 

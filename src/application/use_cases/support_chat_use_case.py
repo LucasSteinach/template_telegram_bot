@@ -14,7 +14,7 @@ class SupportChatUseCase:
         self._support_chat_repository = support_chat_repository
 
     async def get_chat(self, chat_id: int) -> SupportChat | None:
-        return await self._support_chat_repository.get_chat(chat_id)
+        return await self._support_chat_repository.find_by_id(chat_id)
 
     async def create_chat(self, user_id: int, id_: int | None = None) -> SupportChat:
         return await self._support_chat_repository.persist(
@@ -25,11 +25,10 @@ class SupportChatUseCase:
         )
 
     async def close_chat(self, chat_id: int, user: User) -> SupportChat | None:
-        if user is None:
-            logger.error("User not exist")
+        chat = await self._support_chat_repository.find_by_id(chat_id)
+        if not chat:
             return
-        chat = await self._support_chat_repository.get_chat(chat_id)
-        chat.close(user.telegram_id, user.role)
+        chat.close(user.id, user.role)
         return await self.save_chat(chat)
 
     async def save_chat(self, chat: SupportChat) -> SupportChat:

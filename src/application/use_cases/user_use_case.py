@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from datetime import datetime, timezone
 
 from src.application.dto.user_dto import RegisterUser
@@ -9,22 +10,17 @@ class UserUseCase:
     def __init__(self, user_repository: UserRepository) -> None:
         self._user_repository = user_repository
 
-    async def register_user(self, dto: RegisterUser) -> User:
-        exist = await self._user_repository.get_by_telegram_id(dto.telegram_id)
+    async def get_or_create_user(self, dto: RegisterUser) -> User:
+        exist = await self._user_repository.find_by_id(dto.id)
         if exist:
             return exist
 
-        user = User(
-            telegram_id=dto.telegram_id,
-            username=dto.username,
-            full_name=dto.full_name,
-            created_at=datetime.now(timezone.utc),
-        )
-        await self._user_repository.save_user(user)
+        user = User(**asdict(dto), created_at=datetime.now(tz=timezone.utc))
+        await self._user_repository.persist(user)
         return user
 
     async def get_user(self, user_id: int) -> User | None:
-        exist = await self._user_repository.get_by_telegram_id(user_id)
+        exist = await self._user_repository.find_by_id(user_id)
         if not exist:
             return None
 

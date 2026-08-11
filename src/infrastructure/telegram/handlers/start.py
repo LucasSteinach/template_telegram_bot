@@ -19,14 +19,14 @@ router = Router(name="start")
 @router.message(CommandStart())
 async def handle_start(message: Message, container: Container) -> None:
     dto = RegisterUser(
-        telegram_id=message.from_user.id,
+        id=message.from_user.id,
         username=message.from_user.username,
         full_name=message.from_user.full_name or message.from_user.username,
     )
 
     async with container.session_factory() as session:
         uc = container.user_uc(session)
-        user = await uc.register_user(dto)
+        user = await uc.get_or_create_user(dto)
 
     menu_message = await container.redis_storage.get_main_menu_message_data(
         message.from_user.id

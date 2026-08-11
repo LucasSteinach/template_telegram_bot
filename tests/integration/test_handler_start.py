@@ -88,7 +88,7 @@ async def test_handler_start_different_menu_messages(
 
 @pytest.mark.asyncio
 async def test_handler_start_bad_request(
-    container, session, session_factory, message, telegram_user
+    container, session, session_factory, message, user
 ):
     container.redis_storage.get_main_menu_message_data = AsyncMock(
         return_value={

@@ -11,7 +11,7 @@ class UserRole(StrEnum):
 
 @dataclass
 class User:
-    telegram_id: int
+    id: int
     username: str | None
     full_name: str
     created_at: datetime

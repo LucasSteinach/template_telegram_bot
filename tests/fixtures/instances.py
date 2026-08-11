@@ -3,7 +3,27 @@ from datetime import datetime, timezone
 import pytest
 
 from src.domain.entities.support_chat import ChatStatus
-from src.infrastructure.database.models import SupportChatModel, SupportMessageModel
+from src.infrastructure.database.models import (
+    SupportChatModel,
+    SupportMessageModel,
+    UserModel,
+)
+
+
+@pytest.fixture
+def user_instance():
+    def create(**kwargs):
+        data = {
+            "id": 1,
+            "username": "test_user",
+            "full_name": "Test User",
+            "created_at": datetime.now(tz=timezone.utc),
+            "role": "user",
+        }
+        data.update(kwargs)
+        return UserModel(**data)
+
+    return create
 
 
 @pytest.fixture

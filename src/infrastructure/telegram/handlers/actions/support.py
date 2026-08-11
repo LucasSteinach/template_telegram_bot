@@ -114,7 +114,7 @@ async def process_message(
         support_chat.last_activity_at = datetime.now(tz=timezone.utc)
 
         await support_message_uc.save_message(
-            support_chat_id, user.telegram_id, user.role, message.text
+            support_chat_id, user.id, user.role, message.text
         )
 
         if support_chat.status == ChatStatus.CREATED:

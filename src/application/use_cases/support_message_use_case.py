@@ -9,7 +9,7 @@ class SupportMessageUseCase:
         self._support_message_repository = support_message_repository
 
     async def get_message(self, message_id: int) -> SupportMessage | None:
-        return await self._support_message_repository.get_message(message_id)
+        return await self._support_message_repository.find_by_id(message_id)
 
     async def save_message(
         self,

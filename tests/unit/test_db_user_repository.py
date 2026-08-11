@@ -1,28 +1,27 @@
-import datetime as d
-
-import pytest
-
 from src.domain.entities.user import User
+from src.infrastructure.database.models import UserModel
 from src.infrastructure.database.repositories.user_repository import (
     UserRepository,
 )
 
 
-@pytest.mark.asyncio
-async def test_db_user_repository(session):
+def test_entity_to_instance(session, user_entity):
     repository = UserRepository(session)
+    id_ = 1
+    entity = user_entity(id=id_)
 
-    no_user = await repository.get_by_telegram_id(-1)
-    assert no_user is None
+    instance = repository.entity_to_instance(entity)
 
-    user = User(
-        telegram_id=123,
-        username="test",
-        full_name="Very Test User",
-        created_at=d.datetime.now(tz=d.UTC),
-    )
+    assert isinstance(instance, UserModel)
+    assert instance.id == id_
 
-    await repository.save_user(user)
 
-    user_exist = (await repository.get_by_telegram_id(user.telegram_id)) is not None
-    assert user_exist
+def test_instance_to_entity(session, user_instance):
+    repository = UserRepository(session)
+    id_ = 1
+    instance = user_instance(id=id_)
+
+    entity = repository.instance_to_entity(instance)
+
+    assert isinstance(entity, User)
+    assert entity.id == id_

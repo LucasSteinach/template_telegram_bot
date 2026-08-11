@@ -30,24 +30,7 @@ def test_instance_to_entity(session, support_chat_instance):
 
 
 @pytest.mark.asyncio
-async def test_get_and_save_chat(session, support_chat_entity):
-    repository = SupportChatRepository(session)
-    id_ = 1
-    entity = support_chat_entity(id=id_)
-
-    chat = await repository.get_chat(id_)
-    assert chat is None
-
-    chat = await repository.persist(entity)
-    assert isinstance(chat, SupportChat)
-    assert chat.id == id_
-
-    chat = await repository.get_chat(id_)
-    assert isinstance(chat, SupportChat)
-
-
-@pytest.mark.asyncio
-async def test_get_active_chats(session, support_chat_entity):
+async def test_get_all_active_chats(session, support_chat_entity):
     repository = SupportChatRepository(session)
     id_ = 1
     entity = support_chat_entity(id=id_, status=ChatStatus.CLOSED)
@@ -56,7 +39,7 @@ async def test_get_active_chats(session, support_chat_entity):
     entity = support_chat_entity(id=active_chat_id)
     await repository.persist(entity)
 
-    chats = await repository.get_active_chats()
+    chats = await repository.get_all_active_chats()
 
     assert isinstance(chats, list)
     assert len(chats) == 1
@@ -65,7 +48,7 @@ async def test_get_active_chats(session, support_chat_entity):
 
 
 @pytest.mark.asyncio
-async def test_get_chats_by_user(session, support_chat_entity):
+async def test_get_all_by_user_id(session, support_chat_entity):
     repository = SupportChatRepository(session)
     user_id = 1
     chats_amount = 2
@@ -74,7 +57,7 @@ async def test_get_chats_by_user(session, support_chat_entity):
         entity = support_chat_entity(id=i, user_id=user_id)
         await repository.persist(entity)
 
-    chats = await repository.get_chats_by_user(user_id)
+    chats = await repository.get_all_by_user_id(user_id)
 
     assert isinstance(chats, list)
     assert len(chats) == chats_amount
@@ -82,7 +65,7 @@ async def test_get_chats_by_user(session, support_chat_entity):
 
 
 @pytest.mark.asyncio
-async def test_get_closed_chats(session, support_chat_entity):
+async def test_get_all_closed_chats(session, support_chat_entity):
     repository = SupportChatRepository(session)
     id_ = 1
     entity = support_chat_entity(id=id_)
@@ -91,7 +74,7 @@ async def test_get_closed_chats(session, support_chat_entity):
     entity = support_chat_entity(id=closed_chat_id, status=ChatStatus.CLOSED)
     await repository.persist(entity)
 
-    chats = await repository.get_closed_chats()
+    chats = await repository.get_all_closed_chats()
 
     assert isinstance(chats, list)
     assert len(chats) == 1

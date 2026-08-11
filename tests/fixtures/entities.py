@@ -4,6 +4,23 @@ import pytest
 
 from src.domain.entities.support_chat import ChatStatus, SupportChat
 from src.domain.entities.support_message import SupportMessage
+from src.domain.entities.user import User
+
+
+@pytest.fixture
+def user_entity():
+    def create(**kwargs):
+        data = {
+            "id": 1,
+            "username": "test_user",
+            "full_name": "Test User",
+            "role": "user",
+            "created_at": datetime.now(tz=timezone.utc),
+        }
+        data.update(kwargs)
+        return User(**data)
+
+    return create
 
 
 @pytest.fixture
