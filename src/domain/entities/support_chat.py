@@ -1,7 +1,9 @@
 import logging
-from dataclasses import dataclass, field
+from dataclasses import field
 from datetime import datetime, timezone
 from enum import Enum
+
+from pydantic import BaseModel
 
 from src.domain.entities.user import UserRole
 
@@ -15,8 +17,7 @@ class ChatStatus(str, Enum):
     CLOSED = "closed"
 
 
-@dataclass
-class SupportChat:
+class SupportChat(BaseModel):
     user_id: int
 
     id: int | None = None
