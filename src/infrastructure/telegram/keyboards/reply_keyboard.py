@@ -1,13 +1,12 @@
-from dataclasses import dataclass, fields
-from typing import Literal
+from typing import Literal, Self
 
 import aiogram.types as t
+from pydantic import BaseModel, model_validator
 
 CLOSE_CHAT = "Close chat"
 
 
-@dataclass
-class ReplyButton:
+class ReplyButton(BaseModel):
     text: str  # label
 
     row: int = 1
@@ -25,15 +24,15 @@ class ReplyButton:
     web_app: t.WebAppInfo | None = None
     request_user: t.KeyboardButtonRequestUser | None = None
 
-    def __post_init__(self):
+    @model_validator(mode="after")
+    def validate_button(self) -> Self:
         non_action_fields = ["text", "row", "icon_custom_emoji_id", "style"]
         if (
             len(
                 [
                     f
-                    for f in fields(self)
-                    if f.name not in non_action_fields
-                    and getattr(self, f.name) is not None
+                    for f in self.model_fields
+                    if f not in non_action_fields and getattr(self, f) is not None
                 ]
             )
             > 1
@@ -51,6 +50,8 @@ class ReplyButton:
 
         if len(self.text) > 64:
             raise ValueError("max button label length is 64")
+
+        return self
 
 
 def create_button(dto: ReplyButton) -> t.KeyboardButton:

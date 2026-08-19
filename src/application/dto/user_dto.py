@@ -1,10 +1,9 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 from src.domain.entities.user import UserRole
 
 
-@dataclass
-class RegisterUser:
+class RegisterUser(BaseModel):
     id: int
     username: str | None
     full_name: str

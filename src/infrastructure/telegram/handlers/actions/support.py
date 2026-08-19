@@ -48,7 +48,7 @@ async def open_support_chat(
     await callback.message.edit_reply_markup(reply_markup=None)
 
     message = await callback.message.answer(
-        text="Write your message", reply_markup=reply_kb([ReplyButton(CLOSE_CHAT)])
+        text="Write your message", reply_markup=reply_kb([ReplyButton(text=CLOSE_CHAT)])
     )
 
     await add_messages_to_cleanup(

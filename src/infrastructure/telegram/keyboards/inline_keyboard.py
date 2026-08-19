@@ -1,8 +1,8 @@
 import logging
-from dataclasses import dataclass, fields
-from typing import Literal
+from typing import Literal, Self
 
 import aiogram.types as t
+from pydantic import BaseModel, model_validator
 
 from src.infrastructure.telegram.callbacks import AwaitedActionCallback, MenuCallback
 from src.infrastructure.telegram.menu.constants import MENU, MenuItem
@@ -13,8 +13,7 @@ logger = logging.getLogger(__name__)
 BACK_TEXT = "⬅ Back"
 
 
-@dataclass
-class InlineButton:
+class InlineButton(BaseModel):
     text: str  # label
 
     row: int = 1
@@ -33,12 +32,11 @@ class InlineButton:
     callback_game: t.CallbackGame | None = None
     pay: bool | None = None
 
-    def __post_init__(self):
+    @model_validator(mode="after")
+    def validate_button(self) -> Self:
         non_action_fields = ["text", "row", "icon_custom_emoji_id", "style"]
         if not any(
-            getattr(self, f.name)
-            for f in fields(self)
-            if f.name not in non_action_fields
+            getattr(self, f) for f in self.model_fields if f not in non_action_fields
         ):
             raise ValueError(
                 "At least one required: url, callback data etc. \n"
@@ -56,6 +54,8 @@ class InlineButton:
 
         if self.callback_data and len(self.callback_data) > 64:
             raise ValueError("max callback_data length is 64")
+
+        return self
 
 
 def create_button(dto: InlineButton) -> t.InlineKeyboardButton:

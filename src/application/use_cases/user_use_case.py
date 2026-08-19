@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from datetime import datetime, timezone
 
 from src.application.dto.user_dto import RegisterUser
@@ -15,7 +14,9 @@ class UserUseCase:
         if exist:
             return exist
 
-        user = User(**asdict(dto), created_at=datetime.now(tz=timezone.utc))
+        user = User(
+            **dto.model_dump(mode="json"), created_at=datetime.now(tz=timezone.utc)
+        )
         await self._user_repository.persist(user)
         return user
 
