@@ -3,9 +3,7 @@ from dataclasses import field
 from datetime import datetime, timezone
 from enum import Enum
 
-from pydantic import BaseModel
-
-from src.domain.entities.user import UserRole
+from src.domain.entities.base_entity import Entity
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +15,7 @@ class ChatStatus(str, Enum):
     CLOSED = "closed"
 
 
-class SupportChat(BaseModel):
+class SupportChat(Entity):
     user_id: int
 
     id: int | None = None
@@ -34,28 +32,21 @@ class SupportChat(BaseModel):
 
     def assign_operator(self, operator_id: int):
         self.operator_id = operator_id
-        self.active()
-
-    def waiting(self):
-        self.status = ChatStatus.WAITING
-
-    def active(self):
         self.status = ChatStatus.ACTIVE
+        self.last_activity_at = datetime.now(timezone.utc)
 
-    def close(self, user_id: int, role: str) -> None:
-        if user_id not in [self.user_id, self.operator_id] and role != UserRole.ADMIN:
-            logger.warning(f"{role}: {user_id} had attempt to close chat: {self.id}")
-            return
-        if user_id == self.user_id:
-            self._close_by_user()
-        elif self.operator_id == user_id or role == UserRole.ADMIN:
-            self._close_by_operator(user_id, role)
+    def set_waiting(self):
+        self.status = ChatStatus.WAITING
+        self.last_activity_at = datetime.now(timezone.utc)
 
+    def _close(self) -> None:
         self.status = ChatStatus.CLOSED
         self.closed_at = datetime.now(timezone.utc)
 
-    def _close_by_user(self):
+    def close_by_user(self):
         self.closed_by = "user"
+        self._close()
 
-    def _close_by_operator(self, user_id: int, role: str):
+    def close_by_operator(self, user_id: int, role: str):
         self.closed_by = f"{role}:{user_id}"
+        self._close()

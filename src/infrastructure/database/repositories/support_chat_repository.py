@@ -38,10 +38,26 @@ class SupportChatRepository(AsyncBaseRepository[SupportChatModel, SupportChat, i
             closed_by=entity.closed_by,
         )
 
-    async def get_all_active_chats(self) -> list[SupportChat]:
+    async def get_open_chats(self) -> list[SupportChat]:
         result = await self.find_all(
             where=[
                 SupportChatModel.status != ChatStatus.CLOSED,
+            ]
+        )
+        return result.items
+
+    async def get_assigned_chats(self, operator_id: int) -> list[SupportChat]:
+        result = await self.find_all(
+            where=[
+                SupportChatModel.operator_id == operator_id,
+            ]
+        )
+        return result.items
+
+    async def get_active_chats(self) -> list[SupportChat]:
+        result = await self.find_all(
+            where=[
+                SupportChatModel.status == ChatStatus.ACTIVE,
             ]
         )
         return result.items

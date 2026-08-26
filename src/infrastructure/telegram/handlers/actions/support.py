@@ -38,10 +38,7 @@ async def open_support_chat(
     await callback.answer()
     await state.set_state(SupportState.chat)
 
-    async with container.session_factory() as session:
-        support_chat = await container.support_chat_uc(session).create_chat(
-            callback.from_user.id
-        )
+    support_chat = await container.support_chat_uc().create_chat(callback.from_user.id)
 
     await state.update_data({"support_chat_id": support_chat.id})
 
@@ -70,9 +67,8 @@ async def close_chat(
     support_chat_id = data.get("support_chat_id")
     messages = data.get("cleanup_messages")
 
-    async with container.session_factory() as session:
-        user = await container.user_uc(session).get_user(message.from_user.id)
-        await container.support_chat_uc(session).close_chat(support_chat_id, user)
+    user = await container.user_uc().get_user(message.from_user.id)
+    await container.support_chat_uc().close_chat(support_chat_id, user)
 
     last_message = await message.answer(
         text="Thank you! Glad to be helpful to you\nReturn to main menu...",
@@ -104,23 +100,21 @@ async def process_message(
     )
     support_chat_id = (await state.get_data()).get("support_chat_id")
 
-    async with container.session_factory() as session:
-        user_uc = container.user_uc(session)
-        support_chat_uc = container.support_chat_uc(session)
-        support_message_uc = container.support_message_uc(session)
+    user_uc = container.user_uc()
+    support_chat_uc = container.support_chat_uc()
+    support_message_uc = container.support_message_uc()
 
-        user = await user_uc.get_user(message.from_user.id)
-        support_chat = await support_chat_uc.get_chat(support_chat_id)
-        support_chat.last_activity_at = datetime.now(tz=timezone.utc)
+    user = await user_uc.get_user(message.from_user.id)
+    support_chat = await support_chat_uc.get_chat(support_chat_id)
+    support_chat.last_activity_at = datetime.now(tz=timezone.utc)
 
-        await support_message_uc.save_message(
-            support_chat_id, user.id, user.role, message.text
+    await support_message_uc.save_message(
+        support_chat.id, user.id, user.role, message.text
+    )
+
+    if support_chat.status in [ChatStatus.CREATED, ChatStatus.ACTIVE]:
+        await support_chat_uc.user_set_awaiting_status(
+            chat_id=support_chat.id, user=user, topic=truncate(message.text)
         )
-
-        if support_chat.status == ChatStatus.CREATED:
-            support_chat.topic = truncate(message.text)
-            support_chat.waiting()
-
-        await support_chat_uc.save_chat(support_chat)
 
     await add_messages_to_cleanup(state, [message.message_id])

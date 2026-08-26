@@ -1,10 +1,10 @@
 from dataclasses import field
 from datetime import datetime, timezone
 
-from pydantic import BaseModel
+from src.domain.entities.base_entity import Entity
 
 
-class SupportMessage(BaseModel):
+class SupportMessage(Entity):
     chat_id: int
     author_id: int
     author_role: str

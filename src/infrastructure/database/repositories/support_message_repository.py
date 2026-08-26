@@ -34,11 +34,18 @@ class SupportMessageRepository(
             created_at=instance.created_at,
         )
 
-    async def get_all_by_chat_id(self, chat_id: int) -> list[SupportMessage]:
+    async def get_all_by_chat_id(
+        self, chat_id: int, asc: bool = True
+    ) -> list[SupportMessage]:
         result = await self.find_all(
             where=[
                 SupportMessageModel.chat_id == chat_id,
-            ]
+            ],
+            order_by=[
+                SupportMessageModel.created_at.asc()
+                if asc
+                else SupportMessageModel.created_at.desc()
+            ],
         )
 
         return result.items

@@ -11,6 +11,9 @@ class RedisStorage:
     def __init__(self, redis: Redis):
         self.redis = redis
 
+    async def disconnect(self, close_connection_pool=True):
+        await self.redis.aclose(close_connection_pool=close_connection_pool)
+
     @staticmethod
     def _key(user_id: int, action: str) -> str:
         return f"user:{user_id}:{action}"
@@ -34,3 +37,26 @@ class RedisStorage:
             self._key(user_id, "main_menu"),
             json.dumps(data),
         )
+
+    async def save_refresh_token(
+        self, user_id: int, token_id: str, expire_sec: int
+    ) -> None:
+        action = "refresh"
+        key = self._key(user_id, f"{action}:{token_id}")
+
+        await self.redis.set(key, "1", ex=expire_sec)
+        logger.debug("Redis SET %s with TTL %s", key, expire_sec)
+
+    async def check_refresh_token(self, user_id: int, token_id: str) -> bool:
+        action = "refresh"
+        key = self._key(user_id, f"{action}:{token_id}")
+
+        exists = await self.redis.exists(key)
+        return bool(exists)
+
+    async def delete_refresh_token(self, user_id: int, token_id: str) -> None:
+        action = "refresh"
+        key = self._key(user_id, f"{action}:{token_id}")
+
+        await self.redis.delete(key)
+        logger.debug("Redis DEL %s", key)

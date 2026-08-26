@@ -4,7 +4,7 @@ from urllib.parse import quote_plus
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from src.infrastructure.config.settings import settings
+from src.config import settings
 from src.infrastructure.database.models import BaseModel
 
 # this is the Alembic Config object, which provides

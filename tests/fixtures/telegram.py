@@ -5,8 +5,8 @@ import pytest
 from aiogram.types import Chat
 from aiogram.types import User as TelegramUser
 
+from src.config import Settings
 from src.domain.entities.user import User, UserRole
-from src.infrastructure.config.settings import Settings
 from src.infrastructure.telegram import bot as tg_bot
 from src.infrastructure.telegram.menu.constants import MenuItem
 
@@ -31,12 +31,15 @@ def settings():
         db_user="db_user",
         db_password="db_password",
         db_host="db_host",
-        db_port="db_port",
+        db_port="1234",
         db_name="db_name",
         log_level="DEBUG",
         support_user="12345:@test_support_user",
         fsm_storage="redis",
         redis_url="redis://localhost:6379",
+        jwt_secret="",
+        access_exp_sec=100,
+        refresh_exp_sec=500,
     )
 
 

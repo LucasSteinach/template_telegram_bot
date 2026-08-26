@@ -4,8 +4,8 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage
 
+from src.config import Settings
 from src.container import Container
-from src.infrastructure.config.settings import Settings
 from src.infrastructure.telegram.handlers import register_routers
 from src.infrastructure.telegram.middlewares import register_middlewares
 

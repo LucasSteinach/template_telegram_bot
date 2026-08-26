@@ -1,8 +1,8 @@
 import asyncio
 import logging
 
+from src.config import settings
 from src.container import Container
-from src.infrastructure.config.settings import settings
 from src.infrastructure.telegram.bot import (
     create_bot,
     create_dispatcher,
@@ -17,7 +17,12 @@ async def main() -> None:
     dp = create_dispatcher(container, settings)
 
     await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
+    try:
+        await dp.start_polling(bot)
+    finally:
+        await container.redis_storage.disconnect()
+        await container.engine.dispose()
+        await bot.session.close()
 
 
 if __name__ == "__main__":

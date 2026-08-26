@@ -6,6 +6,9 @@ BASE_DIR = Path(__file__).resolve().parents[3]
 
 
 class Settings(BaseSettings):
+    jwt_secret: str
+    access_exp_sec: int
+    refresh_exp_sec: int
     bot_token: str
     db_user: str
     db_password: str
@@ -22,3 +25,11 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+class ROUTE:
+    LOGIN = "/login"
+    REFRESH = "/refresh"
+    LOGOUT = "/logout"
+
+    OPERATOR = "/operator"

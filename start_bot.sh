@@ -2,4 +2,4 @@
 # Launch bot
 
 cd "$(dirname "$0")"
-python3 -m src.main
+python3 -m src.bot_main

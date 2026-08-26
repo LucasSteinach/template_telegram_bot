@@ -91,11 +91,9 @@ class AsyncBaseRepository(ABC, Generic[ModelT, EntityT, IDT]):
 
     async def persist(self, entity: EntityT) -> EntityT:
         instance = self.entity_to_instance(entity)
-
         merged = await self._session.merge(instance)
 
-        await self._session.commit()
-        await self._session.refresh(merged)
+        await self._session.flush()
 
         return self.instance_to_entity(merged)
 

@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import StrEnum
 
-from pydantic import BaseModel
+from src.domain.entities.base_entity import Entity
 
 
 class UserRole(StrEnum):
@@ -10,7 +10,7 @@ class UserRole(StrEnum):
     ADMIN = "admin"
 
 
-class User(BaseModel):
+class User(Entity):
     id: int
     username: str | None = None
     full_name: str
