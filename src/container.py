@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.application.services.auth import AuthService
+from src.application.services.rabbitmq import RabbitMQ
 from src.application.usecases.operator_use_case import (
     OperatorUnitOfWork,
     OperatorUseCase,
@@ -49,6 +50,7 @@ class Container:
             class_=AsyncSession,
             expire_on_commit=False,
         )
+        self.rabbitmq: RabbitMQ = RabbitMQ(self.settings.rabbitmq_url)
 
     def auth_service(self) -> AuthService:
         return AuthService(

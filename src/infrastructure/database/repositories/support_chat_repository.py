@@ -15,6 +15,7 @@ class SupportChatRepository(AsyncBaseRepository[SupportChatModel, SupportChat, i
     def instance_to_entity(self, instance: SupportChatModel) -> SupportChat:
         return SupportChat(
             id=instance.id,
+            telegram_id=instance.telegram_id,
             topic=instance.topic,
             user_id=instance.user_id,
             operator_id=instance.operator_id,
@@ -28,6 +29,7 @@ class SupportChatRepository(AsyncBaseRepository[SupportChatModel, SupportChat, i
     def entity_to_instance(self, entity: SupportChat) -> SupportChatModel:
         return SupportChatModel(
             id=entity.id,
+            telegram_id=entity.telegram_id,
             topic=entity.topic,
             user_id=entity.user_id,
             operator_id=entity.operator_id,
@@ -50,6 +52,14 @@ class SupportChatRepository(AsyncBaseRepository[SupportChatModel, SupportChat, i
         result = await self.find_all(
             where=[
                 SupportChatModel.operator_id == operator_id,
+            ]
+        )
+        return result.items
+
+    async def get_waiting_chats(self) -> list[SupportChat]:
+        result = await self.find_all(
+            where=[
+                SupportChatModel.status == ChatStatus.WAITING,
             ]
         )
         return result.items

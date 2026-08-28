@@ -13,9 +13,11 @@ from src.container import Container
 async def lifespan(application: FastAPI):
     container = Container(settings)
     application.state.container = container
+    await container.rabbitmq.connect()
 
     yield
 
+    await container.rabbitmq.close()
     await container.engine.dispose()
     await container.redis_storage.disconnect()
 

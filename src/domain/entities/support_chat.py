@@ -19,6 +19,7 @@ class SupportChat(Entity):
     user_id: int
 
     id: int | None = None
+    telegram_id: int
     topic: str | None = None
 
     operator_id: int | None = None
@@ -32,6 +33,9 @@ class SupportChat(Entity):
 
     def assign_operator(self, operator_id: int):
         self.operator_id = operator_id
+        self.last_activity_at = datetime.now(timezone.utc)
+
+    def activate(self):
         self.status = ChatStatus.ACTIVE
         self.last_activity_at = datetime.now(timezone.utc)
 

@@ -7,12 +7,14 @@ from typing import Annotated
 
 import bcrypt
 import jwt
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from pydantic import BaseModel, BeforeValidator, EmailStr
 from redis import RedisError
-from starlette import status
 
+from src.application.rules.auth_rules import InvalidAccessToken, InvalidRefreshToken
 from src.domain.entities.user import UserRole
+from src.domain.exceptions import ApplicationException
+from src.domain.rules.rules import check_app_rule
 from src.infrastructure.redis.storage import RedisStorage
 
 logger = logging.getLogger(__name__)
@@ -87,8 +89,7 @@ class AuthService:
 
     def decode_access_token(self, token: str) -> AuthUser:
         data = decode(token, self.jwt_secret)
-        if not data or data.get("type") != "access":
-            raise ValueError("Invalid token type")
+        check_app_rule(InvalidAccessToken(data=data))
 
         return (
             AuthUser(
@@ -101,9 +102,7 @@ class AuthService:
 
     def decode_refresh_token(self, token: str) -> AuthUser:
         data = decode(token, self.jwt_secret)
-
-        if not data or data.get("type") != "refresh":
-            raise ValueError("Invalid token type")
+        check_app_rule(InvalidRefreshToken(data=data))
 
         return AuthUser(
             id=int(data["id_"]),
@@ -137,19 +136,18 @@ class AuthService:
 
     async def refresh_session(self, refresh_token: str) -> tuple[str, str, int]:
         payload = decode(refresh_token, self.jwt_secret)
-        if not payload or payload.get("type") != "refresh":
-            raise ValueError("Invalid token type")
+        check_app_rule(InvalidRefreshToken(data=payload))
 
         user_id = int(payload["id_"])
         token_id = payload.get("data", {}).get("jti") or payload.get("jti")
         role = payload.get("data", {}).get("role") or payload.get("role")
 
         if not token_id:
-            raise ValueError("Missing token identifier (jti)")
+            raise ApplicationException("Missing token identifier (jti)")
 
         is_valid_session = await self.redis.check_refresh_token(user_id, token_id)
         if not is_valid_session:
-            raise ValueError("Refresh token revoked or expired")
+            raise ApplicationException("Refresh token revoked or expired")
 
         await self.redis.delete_refresh_token(user_id, token_id)
 

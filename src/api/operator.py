@@ -4,8 +4,10 @@ import src.application.usecases.support_chat_use_case as sc
 import src.application.usecases.support_message_use_case as sm
 import src.application.usecases.user_use_case as u
 from src.api.response import IdMessage
+from src.application.services.rabbitmq import RabbitMQ
 from src.config import ROUTE
 from src.dependencies.auth import get_auth_operator
+from src.dependencies.services import get_rabbitmq
 from src.dependencies.usecases import (
     get_support_chat_use_case,
     get_support_message_use_case,
@@ -27,6 +29,28 @@ async def get_profile(
     return u.user_read_model(user)
 
 
+@router.get(ROUTE.OPERATOR + "/chats/assigned")
+async def get_assigned_support_chats(
+    operator=Depends(get_auth_operator),
+    uc: sc.SupportChatUseCase = Depends(get_support_chat_use_case),
+) -> list[sc.SupportChatReadModel]:
+    chats = await uc.get_assigned_chats(operator.id)
+    result = [sc.support_chat_read_model(chat) for chat in chats]
+
+    return result
+
+
+@router.get(ROUTE.OPERATOR + "/chats/waiting")
+async def get_waiting_support_chats(
+    _=Depends(get_auth_operator),
+    uc: sc.SupportChatUseCase = Depends(get_support_chat_use_case),
+) -> list[sc.SupportChatReadModel]:
+    chats = await uc.get_waiting_chats()
+    result = [sc.support_chat_read_model(chat) for chat in chats]
+
+    return result
+
+
 @router.get(ROUTE.OPERATOR + "/chats/{chat_id}")
 async def get_chat(
     chat_id: int,
@@ -46,12 +70,19 @@ async def send_answer(
     operator=Depends(get_auth_operator),
     uc: sc.SupportChatUseCase = Depends(get_support_chat_use_case),
     messages_uc: sm.SupportMessageUseCase = Depends(get_support_message_use_case),
+    publisher: RabbitMQ = Depends(get_rabbitmq),
 ) -> IdMessage:
     chat = await uc.get_chat(chat_id)
-    await uc.assign_operator(chat.id, operator.id, operator.role)
+    await uc.operator_answers(chat.id, operator.id, operator.role)
     message = await messages_uc.save_message(
         chat_id=chat.id, author_id=operator.id, author_role=operator.role, text=req.text
     )
+
+    data = {
+        "chat_id": chat.telegram_id,
+        "text": f"OPERATOR: {operator.id}\n\n{req.text}",
+    }
+    await publisher.publish("support_messages", data)
 
     return IdMessage(detail="success", id=message.id)
 
@@ -66,27 +97,5 @@ async def get_chat_history(
     chat = await uc.get_chat(chat_id)
     messages = await messages_uc.get_chat_history(chat.id)
     result = sm.chat_history(messages)
-
-    return result
-
-
-@router.get(ROUTE.OPERATOR + "/chats/assigned")
-async def get_assigned_support_chats(
-    operator=Depends(get_auth_operator),
-    uc: sc.SupportChatUseCase = Depends(get_support_chat_use_case),
-) -> list[sc.SupportChatReadModel]:
-    chats = await uc.get_assigned_chats(operator.id)
-    result = [sc.support_chat_read_model(chat) for chat in chats]
-
-    return result
-
-
-@router.get(ROUTE.OPERATOR + "/chats/waiting")
-async def get_waiting_support_chats(
-    operator=Depends(get_auth_operator),
-    uc: sc.SupportChatUseCase = Depends(get_support_chat_use_case),
-) -> list[sc.SupportChatReadModel]:
-    chats = await uc.get_assigned_chats(operator.id)
-    result = [sc.support_chat_read_model(chat) for chat in chats]
 
     return result
