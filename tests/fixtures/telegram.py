@@ -8,7 +8,7 @@ from aiogram.types import User as TelegramUser
 from src.config import Settings
 from src.domain.entities.user import User, UserRole
 from src.infrastructure.telegram import bot as tg_bot
-from src.infrastructure.telegram.menu.constants import MenuItem
+from src.infrastructure.telegram.menu.menu import MenuItem
 
 
 @pytest.fixture(

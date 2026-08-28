@@ -12,7 +12,7 @@ from src.infrastructure.telegram.handlers.actions.helpers import (
     delete_messages,
 )
 from src.infrastructure.telegram.keyboards.inline_keyboard import build_keyboard
-from src.infrastructure.telegram.menu.constants import MENU
+from src.infrastructure.telegram.menu.menu import MENU
 
 logger = logging.getLogger(__name__)
 

@@ -67,6 +67,11 @@ class SupportChatUseCase:
         return support_chat
 
     @async_transaction(read_only=True)
+    async def get_user_chats(self, user_id: int) -> list[SupportChat]:
+        chats = await self.uow.chat_repository.get_all_by_user_id(user_id)
+        return chats
+
+    @async_transaction(read_only=True)
     async def get_assigned_chats(self, operator_id: int) -> list[SupportChat]:
         chats = await self.uow.chat_repository.get_assigned_chats(operator_id)
         return chats

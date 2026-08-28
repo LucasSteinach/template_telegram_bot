@@ -1,4 +1,4 @@
-from src.infrastructure.telegram.menu.constants import MENU, MenuItem
+from src.infrastructure.telegram.menu.menu import MENU, MenuItem
 
 
 def get_path_to_item(search_id: str, item: MenuItem = MENU) -> str | None:

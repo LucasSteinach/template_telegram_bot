@@ -76,6 +76,9 @@ class SupportChatRepository(AsyncBaseRepository[SupportChatModel, SupportChat, i
         result = await self.find_all(
             where=[
                 SupportChatModel.user_id == user_id,
+            ],
+            order_by=[
+                SupportChatModel.created_at.asc()
             ]
         )
         return result.items

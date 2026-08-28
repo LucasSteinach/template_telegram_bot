@@ -18,7 +18,7 @@ from src.infrastructure.telegram.keyboards.reply_keyboard import (
     ReplyButton,
     reply_kb,
 )
-from src.infrastructure.telegram.menu.constants import MENU
+from src.infrastructure.telegram.menu.menu import MENU
 from src.utils.text import truncate
 
 logger = logging.getLogger(__name__)
