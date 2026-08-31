@@ -1,5 +1,5 @@
 #!/bin/bash
 # Launch bot
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/backend"
 python3 -m src.bot_main
