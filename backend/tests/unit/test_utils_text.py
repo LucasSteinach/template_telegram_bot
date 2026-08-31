@@ -1,4 +1,4 @@
-from src.utils.text import truncate
+from utils.text import truncate
 
 
 def test_truncate():

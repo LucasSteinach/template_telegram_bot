@@ -2,9 +2,9 @@ import pytest
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage
 
-from src.infrastructure.telegram import bot as b
-from src.infrastructure.telegram.bot import create_fsm_storage
-from src.infrastructure.telegram.middlewares import ContainerMiddleware
+from infrastructure.telegram import bot as b
+from infrastructure.telegram.bot import create_fsm_storage
+from infrastructure.telegram.middlewares import ContainerMiddleware
 
 
 def test_create_fsm_storage(settings):

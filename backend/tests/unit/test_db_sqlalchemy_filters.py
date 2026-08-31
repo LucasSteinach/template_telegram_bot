@@ -1,9 +1,9 @@
 import pytest
 
-from src.domain.db_filters.fields import NumericFilterField, StringFilterField
-from src.domain.db_filters.operators import LogicalOperator
-from src.infrastructure.database.models import UserModel
-from src.infrastructure.database.sqlalchemy.filters import (
+from domain.db_filters.fields import NumericFilterField, StringFilterField
+from domain.db_filters.operators import LogicalOperator
+from infrastructure.database.models import UserModel
+from infrastructure.database.sqlalchemy.filters import (
     FilterGroup,
     SQLAlchemyFilter,
     UserFilter,

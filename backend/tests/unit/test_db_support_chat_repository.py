@@ -1,8 +1,8 @@
 import pytest
 
-from src.domain.entities.support_chat import ChatStatus, SupportChat
-from src.infrastructure.database.models import SupportChatModel
-from src.infrastructure.database.repositories.support_chat_repository import (
+from domain.entities.support_chat import ChatStatus, SupportChat
+from infrastructure.database.models import SupportChatModel
+from infrastructure.database.repositories.support_chat_repository import (
     SupportChatRepository,
 )
 

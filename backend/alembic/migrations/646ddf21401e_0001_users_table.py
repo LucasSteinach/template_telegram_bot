@@ -11,7 +11,7 @@ from collections.abc import Sequence
 import sqlalchemy as sa
 
 from alembic import op
-from src.domain.entities.user import UserRole
+from domain.entities.user import UserRole
 
 # revision identifiers, used by Alembic.
 revision: str = "646ddf21401e"

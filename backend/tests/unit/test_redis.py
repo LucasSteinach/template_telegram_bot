@@ -2,12 +2,12 @@ from unittest.mock import patch
 
 import pytest
 
-from src.infrastructure.redis.helpers import generate_message_hash
+from infrastructure.redis.helpers import generate_message_hash
 
 
 @pytest.mark.asyncio
 async def test_storage_main_menu_message_data(redis_storage, message, telegram_user):
-    with patch("src.infrastructure.redis.storage.logger") as logger_mock:
+    with patch("infrastructure.redis.storage.logger") as logger_mock:
         await redis_storage.set_main_menu_message_data(telegram_user.id, message)
         data = await redis_storage.get_main_menu_message_data(telegram_user.id)
 

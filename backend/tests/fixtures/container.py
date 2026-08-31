@@ -1,6 +1,6 @@
 import pytest
 
-from src.container import Container
+from container import Container
 
 
 @pytest.fixture()

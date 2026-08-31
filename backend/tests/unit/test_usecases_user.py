@@ -1,14 +1,12 @@
-from __future__ import annotations
-
 import pytest
 
-from src.application.usecases.user_use_case import (
+from application.usecases.user_use_case import (
     RegisterUser,
     UserUnitOfWork,
     UserUseCase,
 )
-from src.domain.entities.user import User
-from src.domain.exceptions import BusinessLogicException
+from domain.entities.user import User
+from domain.exceptions import BusinessLogicException
 
 
 class FakeUserRepository:

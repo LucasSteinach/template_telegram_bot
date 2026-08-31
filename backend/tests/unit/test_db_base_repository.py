@@ -1,10 +1,10 @@
 import pytest
 
-from src.domain.entities.user import User
-from src.infrastructure.database.repositories.base_repository import (
+from domain.entities.user import User
+from infrastructure.database.repositories.base_repository import (
     FindAllResult,
 )
-from src.infrastructure.database.repositories.user_repository import UserRepository
+from infrastructure.database.repositories.user_repository import UserRepository
 
 
 @pytest.mark.asyncio

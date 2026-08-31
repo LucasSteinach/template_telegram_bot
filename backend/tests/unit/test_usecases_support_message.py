@@ -1,13 +1,11 @@
-from __future__ import annotations
-
 import pytest
 
-from src.application.usecases.support_message_use_case import (
+from application.usecases.support_message_use_case import (
     SupportMessageUnitOfWork,
     SupportMessageUseCase,
 )
-from src.domain.entities.support_message import SupportMessage
-from src.domain.exceptions import BusinessLogicException
+from domain.entities.support_message import SupportMessage
+from domain.exceptions import BusinessLogicException
 
 
 class FakeSupportMessageRepository:

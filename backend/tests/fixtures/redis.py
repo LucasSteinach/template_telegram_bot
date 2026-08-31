@@ -3,7 +3,7 @@ import pytest
 import pytest_asyncio
 from redis.asyncio import Redis
 
-from src.infrastructure.redis.storage import RedisStorage
+from infrastructure.redis.storage import RedisStorage
 
 
 @pytest_asyncio.fixture

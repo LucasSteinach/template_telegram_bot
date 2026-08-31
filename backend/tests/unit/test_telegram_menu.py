@@ -2,9 +2,9 @@ from unittest.mock import ANY, AsyncMock
 
 import pytest
 
-from src.infrastructure.telegram.handlers.menu import render_menu
-from src.infrastructure.telegram.menu.helpers import get_menu_item
-from src.infrastructure.telegram.menu.menu import MENU, MenuItem
+from infrastructure.telegram.handlers.menu import render_menu
+from infrastructure.telegram.menu.helpers import get_menu_item
+from infrastructure.telegram.menu.menu import MENU, MenuItem
 
 
 def test_constants_menu_item(menu_item):

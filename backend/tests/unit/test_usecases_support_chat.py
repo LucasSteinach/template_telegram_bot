@@ -1,13 +1,11 @@
-from __future__ import annotations
-
 import pytest
 
-from src.application.usecases.support_chat_use_case import (
+from application.usecases.support_chat_use_case import (
     SupportChatUnitOfWork,
     SupportChatUseCase,
 )
-from src.domain.entities.support_chat import ChatStatus, SupportChat
-from src.domain.exceptions import BusinessLogicException
+from domain.entities.support_chat import ChatStatus, SupportChat
+from domain.exceptions import BusinessLogicException
 
 
 class FakeSupportChatRepository:

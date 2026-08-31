@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 
 import pytest
 
-from src.domain.entities.support_chat import ChatStatus, SupportChat
-from src.domain.entities.support_message import SupportMessage
-from src.domain.entities.user import User
+from domain.entities.support_chat import ChatStatus, SupportChat
+from domain.entities.support_message import SupportMessage
+from domain.entities.user import User
 
 
 @pytest.fixture

@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.pool import StaticPool
 
-from src.infrastructure.database.models import BaseModel
+from infrastructure.database.models import BaseModel
 
 
 @pytest_asyncio.fixture(scope="session")

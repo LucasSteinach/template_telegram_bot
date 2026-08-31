@@ -1,14 +1,43 @@
 # ==========================================
 # Python
 # ==========================================
-__pycache__/
-*.py[cod]
-*$py.class
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # ==========================================
 # pytest + coverage
 # ==========================================
-/.coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+cover/
+doc/_build/
 
 # Virtual environments
 .venv/
@@ -33,21 +62,26 @@ logs/
 # Ruff
 # ==========================================
 .ruff_cache/
+.mypy_cache/
+.poetry/
 
 # ==========================================
 # IDE
 # ==========================================
-
-# PyCharm
-.idea/
-
-# macOS
 .DS_Store
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
 
 # ==========================================
 # Docker
 # ==========================================
 docker-compose.override.yml
+.dockerignore
 
 # ==========================================
 # SQLite
@@ -72,3 +106,12 @@ appendonly.aof
 *.temp
 .cache/
 TODO.md
+
+# ==========================================
+# Local files and volumes
+# ==========================================
+uploads/
+**/uploads/
+redis_data/
+postgres_data/
+rabbitmq_data/

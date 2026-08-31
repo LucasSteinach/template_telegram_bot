@@ -1,19 +1,19 @@
 import pytest
 
-from src.application.usecases.operator_use_case import (
+from application.usecases.operator_use_case import (
     OperatorUnitOfWork,
     OperatorUseCase,
 )
-from src.application.usecases.support_chat_use_case import (
+from application.usecases.support_chat_use_case import (
     SupportChatUnitOfWork,
     SupportChatUseCase,
 )
-from src.application.usecases.support_message_use_case import (
+from application.usecases.support_message_use_case import (
     SupportMessageUnitOfWork,
     SupportMessageUseCase,
 )
-from src.application.usecases.user_use_case import UserUnitOfWork, UserUseCase
-from src.container import Container
+from application.usecases.user_use_case import UserUnitOfWork, UserUseCase
+from container import Container
 
 
 @pytest.mark.asyncio

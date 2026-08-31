@@ -1,8 +1,8 @@
 import pytest
 from pydantic import model_validator
 
-from src.domain.db_filters.base_filter import BaseFilter
-from src.infrastructure.database.models import UserModel
+from domain.db_filters.base_filter import BaseFilter
+from infrastructure.database.models import UserModel
 
 
 class DummyFilter(BaseFilter):

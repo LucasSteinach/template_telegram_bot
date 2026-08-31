@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from src.domain.entities.support_chat import ChatStatus, SupportChat
-from src.domain.entities.user import UserRole
+from domain.entities.support_chat import ChatStatus, SupportChat
+from domain.entities.user import UserRole
 
 
 def support_chat():

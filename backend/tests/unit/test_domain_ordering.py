@@ -1,9 +1,9 @@
 import pytest
 from pydantic import model_validator
 
-from src.domain.db_filters.operators import SortDirection
-from src.domain.db_filters.ordering import BaseOrderBy, SortField
-from src.infrastructure.database.models import UserModel
+from domain.db_filters.operators import SortDirection
+from domain.db_filters.ordering import BaseOrderBy, SortField
+from infrastructure.database.models import UserModel
 
 
 class DummyOrderBy(BaseOrderBy):

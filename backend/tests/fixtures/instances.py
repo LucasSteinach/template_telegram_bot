@@ -2,8 +2,8 @@ from datetime import datetime, timezone
 
 import pytest
 
-from src.domain.entities.support_chat import ChatStatus
-from src.infrastructure.database.models import (
+from domain.entities.support_chat import ChatStatus
+from infrastructure.database.models import (
     SupportChatModel,
     SupportMessageModel,
     UserModel,

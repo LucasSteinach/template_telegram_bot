@@ -1,8 +1,8 @@
 import pytest
 
-from src.domain.db_filters.ordering import SortField
-from src.infrastructure.database.models import UserModel
-from src.infrastructure.database.sqlalchemy.ordering import SQLAlchemyOrderBy
+from domain.db_filters.ordering import SortField
+from infrastructure.database.models import UserModel
+from infrastructure.database.sqlalchemy.ordering import SQLAlchemyOrderBy
 
 
 class DummyOrderBy(SQLAlchemyOrderBy):

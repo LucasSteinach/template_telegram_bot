@@ -4,31 +4,31 @@ import pytest
 from aiogram import Dispatcher, Router
 from aiogram.exceptions import TelegramBadRequest
 
-from src.domain.entities.support_chat import ChatStatus
-from src.infrastructure.telegram.callbacks import MenuCallback
-from src.infrastructure.telegram.fsm_states import InputDataState, SupportState
-from src.infrastructure.telegram.handlers import register_routers
-from src.infrastructure.telegram.handlers.actions.helpers import (
+from domain.entities.support_chat import ChatStatus
+from infrastructure.telegram.callbacks import MenuCallback
+from infrastructure.telegram.fsm_states import InputDataState, SupportState
+from infrastructure.telegram.handlers import register_routers
+from infrastructure.telegram.handlers.actions.helpers import (
     add_messages_to_cleanup,
     delete_messages,
 )
-from src.infrastructure.telegram.handlers.actions.input_data import (
+from infrastructure.telegram.handlers.actions.input_data import (
     input_data_handler,
     process_input,
 )
-from src.infrastructure.telegram.handlers.actions.support import (
+from infrastructure.telegram.handlers.actions.support import (
     close_chat,
     open_support_chat,
     process_message,
 )
-from src.infrastructure.telegram.handlers.fallback import delete_unhandled_messages
-from src.infrastructure.telegram.handlers.menu import menu_handler
+from infrastructure.telegram.handlers.fallback import delete_unhandled_messages
+from infrastructure.telegram.handlers.menu import menu_handler
 
 
 def test_handlers_init():
     fake_router = Router(name="test")
     with patch(
-        "src.infrastructure.telegram.handlers.get_all_routers",
+        "infrastructure.telegram.handlers.get_all_routers",
         return_value=[fake_router],
     ):
         dp = Dispatcher()
@@ -44,7 +44,7 @@ def test_handlers_init():
 @pytest.mark.asyncio
 async def test_menu_handler(callback):
     callback_data = MenuCallback(item_id="root")
-    with patch("src.infrastructure.telegram.handlers.menu.render_menu") as mock_render:
+    with patch("infrastructure.telegram.handlers.menu.render_menu") as mock_render:
         await menu_handler(callback, callback_data)
 
     callback.answer.assert_awaited_once()
@@ -65,7 +65,7 @@ async def test_fallback_handler(message):
 
 @pytest.mark.asyncio
 async def test_actions_input_data_handler(callback):
-    path = "src.infrastructure.telegram.handlers.actions.input_data"
+    path = "infrastructure.telegram.handlers.actions.input_data"
     state = AsyncMock()
     state.set_state = AsyncMock()
 
@@ -83,7 +83,7 @@ async def test_actions_input_data_handler(callback):
 
 @pytest.mark.asyncio
 async def test_actions_process_input_handler(container, message):
-    path = "src.infrastructure.telegram.handlers.actions.input_data"
+    path = "infrastructure.telegram.handlers.actions.input_data"
     state = AsyncMock()
     state.get_data = AsyncMock(return_value={"cleanup_messages": []})
     state.clear = AsyncMock()
@@ -120,7 +120,7 @@ async def test_helpers_add_messages_to_cleanup():
 
 @pytest.mark.asyncio
 async def test_helpers_delete_messages(message):
-    path = "src.infrastructure.telegram.handlers.actions.helpers"
+    path = "infrastructure.telegram.handlers.actions.helpers"
     message.bot = Mock()
     message.bot.delete_message = AsyncMock()
     message_ids = [1, 2, 3]
@@ -142,7 +142,7 @@ async def test_helpers_delete_messages(message):
 
 @pytest.mark.asyncio
 async def test_support_open_chat(callback, container):
-    path = "src.infrastructure.telegram.handlers.actions.support"
+    path = "infrastructure.telegram.handlers.actions.support"
     support_chat_id = 1
 
     state = AsyncMock()
@@ -174,7 +174,7 @@ async def test_support_open_chat(callback, container):
 
 @pytest.mark.asyncio
 async def test_support_close_chat(container, message):
-    path = "src.infrastructure.telegram.handlers.actions.support"
+    path = "infrastructure.telegram.handlers.actions.support"
     support_chat_id = 1
 
     state = AsyncMock()
@@ -213,7 +213,7 @@ async def test_support_close_chat(container, message):
 
 @pytest.mark.asyncio
 async def test_support_process_message(container, message, user):
-    path = "src.infrastructure.telegram.handlers.actions.support"
+    path = "infrastructure.telegram.handlers.actions.support"
     support_chat_id = 1
 
     state = AsyncMock()

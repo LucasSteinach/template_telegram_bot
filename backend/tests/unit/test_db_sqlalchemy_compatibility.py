@@ -1,9 +1,9 @@
 import pytest
 
-from src.domain.db_filters.base_filter import BaseFilter
-from src.domain.db_filters.fields import NumericFilterField, StringFilterField
-from src.infrastructure.database.models import UserModel
-from src.infrastructure.database.sqlalchemy.compatibility import (
+from domain.db_filters.base_filter import BaseFilter
+from domain.db_filters.fields import NumericFilterField, StringFilterField
+from infrastructure.database.models import UserModel
+from infrastructure.database.sqlalchemy.compatibility import (
     get_filter_field_type,
     is_field_compatible,
 )

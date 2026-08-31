@@ -3,8 +3,8 @@ from unittest.mock import ANY, AsyncMock, patch
 import pytest
 from aiogram.exceptions import TelegramBadRequest
 
-from src.infrastructure.telegram.handlers.start import handle_start
-from src.infrastructure.telegram.menu.menu import MENU
+from infrastructure.telegram.handlers.start import handle_start
+from infrastructure.telegram.menu.menu import MENU
 
 
 @pytest.mark.asyncio
@@ -16,7 +16,7 @@ async def test_handler_start_first_time(
     container.redis_storage.set_main_menu_message_data = AsyncMock()
 
     with patch(
-        "src.infrastructure.telegram.handlers.start.delete_messages",
+        "infrastructure.telegram.handlers.start.delete_messages",
         new_callable=AsyncMock,
     ) as delete_mock:
         await handle_start(message, container)
@@ -43,11 +43,11 @@ async def test_handler_start_menu_exists(
 
     with (
         patch(
-            "src.infrastructure.telegram.handlers.start.delete_messages",
+            "infrastructure.telegram.handlers.start.delete_messages",
             new_callable=AsyncMock,
         ) as delete_mock,
         patch(
-            "src.infrastructure.telegram.handlers.start.asyncio.sleep",
+            "infrastructure.telegram.handlers.start.asyncio.sleep",
             new_callable=AsyncMock,
         ),
     ):
@@ -73,7 +73,7 @@ async def test_handler_start_different_menu_messages(
     container.redis_storage.set_main_menu_message_data = AsyncMock()
 
     with patch(
-        "src.infrastructure.telegram.handlers.start.delete_messages",
+        "infrastructure.telegram.handlers.start.delete_messages",
         new_callable=AsyncMock,
     ) as delete_mock:
         await handle_start(message, container)
@@ -104,10 +104,10 @@ async def test_handler_start_bad_request(
 
     with (
         patch(
-            "src.infrastructure.telegram.handlers.start.delete_messages",
+            "infrastructure.telegram.handlers.start.delete_messages",
             new_callable=AsyncMock,
         ) as delete_mock,
-        patch("src.infrastructure.telegram.handlers.start.logger") as logger_mock,
+        patch("infrastructure.telegram.handlers.start.logger") as logger_mock,
     ):
         await handle_start(message, container)
 

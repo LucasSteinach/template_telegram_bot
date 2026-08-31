@@ -1,8 +1,6 @@
-from src.domain.entities.user import User
-from src.infrastructure.database.models import UserModel
-from src.infrastructure.database.repositories.user_repository import (
-    UserRepository,
-)
+from domain.entities.user import User
+from infrastructure.database.models import UserModel
+from infrastructure.database.repositories.user_repository import UserRepository
 
 
 def test_entity_to_instance(session, user_entity):

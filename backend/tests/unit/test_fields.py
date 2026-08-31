@@ -2,12 +2,12 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from src.domain.db_filters.fields import (
+from domain.db_filters.fields import (
     DatetimeFilterField,
     FilterField,
     NumericFilterField,
 )
-from src.domain.db_filters.operators import FieldOperator
+from domain.db_filters.operators import FieldOperator
 
 
 class DummyField(FilterField):

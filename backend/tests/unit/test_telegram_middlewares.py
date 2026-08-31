@@ -4,16 +4,13 @@ from unittest.mock import AsyncMock, MagicMock, call
 
 import pytest
 
-from src.container import Container
-from src.infrastructure.telegram.middlewares import CallbackLockMiddleware
-from src.infrastructure.telegram.middlewares.container_middleware import (
-    ContainerMiddleware,
-)
+from container import Container
+from infrastructure.telegram.middlewares import CallbackLockMiddleware
+from infrastructure.telegram.middlewares.container_middleware import ContainerMiddleware
 
 
 @pytest.mark.asyncio
-async def test_container_middleware(session, settings):
-    # session_factory = MagicMock()
+async def test_container_middleware(settings):
     container = Container(settings)
     middleware = ContainerMiddleware(container)
 

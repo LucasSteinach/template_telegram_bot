@@ -1,22 +1,22 @@
 import pytest
 from sqlalchemy import ColumnElement, and_, not_, or_
 
-from src.domain.db_filters.fields import (
+from domain.db_filters.fields import (
     FilterField,
     NumericFilterField,
     StringFilterField,
 )
-from src.domain.db_filters.operators import FieldOperator, LogicalOperator
-from src.domain.db_filters.ordering import SortField
-from src.infrastructure.database.models import UserModel
-from src.infrastructure.database.sqlalchemy.expressions import (
+from domain.db_filters.operators import FieldOperator, LogicalOperator
+from domain.db_filters.ordering import SortField
+from infrastructure.database.models import UserModel
+from infrastructure.database.sqlalchemy.expressions import (
     filter_field_to_expression,
     filter_to_expressions,
     group_to_expression,
     order_by_to_expression,
 )
-from src.infrastructure.database.sqlalchemy.filters import FilterGroup, UserFilter
-from src.infrastructure.database.sqlalchemy.ordering import SQLAlchemyOrderBy
+from infrastructure.database.sqlalchemy.filters import FilterGroup, UserFilter
+from infrastructure.database.sqlalchemy.ordering import SQLAlchemyOrderBy
 
 
 def compile_expression(exp: ColumnElement):

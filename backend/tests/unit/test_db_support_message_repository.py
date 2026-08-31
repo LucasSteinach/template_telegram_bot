@@ -1,10 +1,8 @@
 import pytest
 
-from src.domain.entities.support_message import SupportMessage
-from src.infrastructure.database.models import SupportMessageModel
-from src.infrastructure.database.repositories.support_message_repository import (
-    SupportMessageRepository,
-)
+from domain.entities.support_message import SupportMessage
+from infrastructure.database.models import SupportMessageModel
+from infrastructure.database.repositories.support_message_repository import SupportMessageRepository
 
 
 def test_entity_to_instance(session, support_message_entity):

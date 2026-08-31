@@ -5,10 +5,10 @@ import pytest
 from aiogram.types import Chat
 from aiogram.types import User as TelegramUser
 
-from src.config import Settings
-from src.domain.entities.user import User, UserRole
-from src.infrastructure.telegram import bot as tg_bot
-from src.infrastructure.telegram.menu.menu import MenuItem
+from config import Settings
+from domain.entities.user import User, UserRole
+from infrastructure.telegram import bot as tg_bot
+from infrastructure.telegram.menu.menu import MenuItem
 
 
 @pytest.fixture(

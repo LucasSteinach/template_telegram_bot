@@ -8,10 +8,10 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
 )
 
-from src.infrastructure.telegram.callbacks import AwaitedActionCallback, MenuCallback
-from src.infrastructure.telegram.keyboards import inline_keyboard as ik
-from src.infrastructure.telegram.keyboards import reply_keyboard as rk
-from src.infrastructure.telegram.menu.menu import MENU
+from infrastructure.telegram.callbacks import AwaitedActionCallback, MenuCallback
+from infrastructure.telegram.keyboards import inline_keyboard as ik
+from infrastructure.telegram.keyboards import reply_keyboard as rk
+from infrastructure.telegram.menu.menu import MENU
 
 
 def test_inline_button():
