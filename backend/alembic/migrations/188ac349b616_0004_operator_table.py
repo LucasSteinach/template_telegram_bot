@@ -12,6 +12,9 @@ import sqlalchemy as sa
 
 from alembic import op
 
+from application.services.auth import hash_password
+from config import settings
+
 # revision identifiers, used by Alembic.
 revision: str = "188ac349b616"
 down_revision: str | None = "18dd95e550a4"
@@ -31,6 +34,30 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_operators_email"), "operators", ["email"], unique=True)
+
+    operators_table = sa.table(
+        "operators",
+        sa.column("id", sa.BigInteger),
+        sa.column("email", sa.String),
+        sa.column("password", sa.String),
+        sa.column("is_active", sa.Boolean),
+        sa.column("role", sa.String),
+    )
+
+    operator_id, email, password = settings.support_user.split(":")
+
+    op.bulk_insert(
+        operators_table,
+        [
+            {
+                "id": int(operator_id),
+                "email": email,
+                "password": hash_password(password),
+                "is_active": True,
+                "role": "operator",
+            }
+        ],
+    )
     # ### end Alembic commands ###
 
 
