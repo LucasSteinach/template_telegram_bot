@@ -30,16 +30,16 @@ def test_instance_to_entity(session, support_chat_instance):
 
 
 @pytest.mark.asyncio
-async def test_get_all_active_chats(session, support_chat_entity):
+async def test_get_active_chats(session, support_chat_entity):
     repository = SupportChatRepository(session)
     id_ = 1
     entity = support_chat_entity(id=id_, status=ChatStatus.CLOSED)
     await repository.persist(entity)
     active_chat_id = 2
-    entity = support_chat_entity(id=active_chat_id)
+    entity = support_chat_entity(id=active_chat_id, status=ChatStatus.ACTIVE)
     await repository.persist(entity)
 
-    chats = await repository.get_all_active_chats()
+    chats = await repository.get_active_chats()
 
     assert isinstance(chats, list)
     assert len(chats) == 1

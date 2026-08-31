@@ -1,4 +1,4 @@
-from aiogram import Router, F
+from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message
 
 from src.container import Container
@@ -14,7 +14,7 @@ def history_to_text(history: list[SupportMessage]):
     texts = []
     for message in history:
         texts.append(
-            f"{message.author_role.upper() if message.author_role != "user" else "YOU"}\n"
+            f"{message.author_role.upper() if message.author_role != 'user' else 'YOU'}\n"
             f"{message.text}\n"
         )
     return "\n".join(texts)
@@ -29,9 +29,7 @@ async def render_menu(message: Message, item_id: str = "root"):
 
 @router.callback_query(MenuCallback.filter(F.item_id == "history"))
 async def support_history_handler(
-    callback: CallbackQuery,
-    callback_data: MenuCallback,
-    container: Container
+    callback: CallbackQuery, callback_data: MenuCallback, container: Container
 ):
     support_chat_uc = container.support_chat_uc()
     support_messages_uc = container.support_message_uc()
@@ -43,12 +41,16 @@ async def support_history_handler(
         chat = chats[-1]
         history = await support_messages_uc.get_chat_history(chat.id)
 
-        text = (f"{chat.created_at.strftime("%Y.%m.%d")}\n"
-                f"{chat.topic}\n\n"
-                f"{history_to_text(history)}")
+        text = (
+            f"{chat.created_at.strftime('%Y.%m.%d')}\n"
+            f"{chat.topic}\n\n"
+            f"{history_to_text(history)}"
+        )
 
     await menu_handler(callback, callback_data)
-    await callback.message.edit_text(text=text, reply_markup=build_keyboard(get_menu_item("history")))
+    await callback.message.edit_text(
+        text=text, reply_markup=build_keyboard(get_menu_item("history"))
+    )
 
 
 @router.callback_query(MenuCallback.filter())

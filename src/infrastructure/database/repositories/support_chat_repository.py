@@ -77,9 +77,7 @@ class SupportChatRepository(AsyncBaseRepository[SupportChatModel, SupportChat, i
             where=[
                 SupportChatModel.user_id == user_id,
             ],
-            order_by=[
-                SupportChatModel.created_at.asc()
-            ]
+            order_by=[SupportChatModel.created_at.asc()],
         )
         return result.items
 

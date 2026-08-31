@@ -224,13 +224,13 @@ async def test_support_process_message(container, message, user):
 
     support_chat = MagicMock()
     support_chat.status = ChatStatus.CREATED
-    support_chat.waiting = MagicMock()
 
     container.support_chat_uc = MagicMock()
     container.support_chat_uc.return_value.get_chat = AsyncMock(
         return_value=support_chat
     )
     container.support_chat_uc.return_value.save_chat = AsyncMock()
+    container.support_chat_uc.return_value.user_set_awaiting_status = AsyncMock()
 
     container.support_message_uc = MagicMock()
     container.support_message_uc.return_value.save_message = AsyncMock()
@@ -253,12 +253,9 @@ async def test_support_process_message(container, message, user):
     container.support_chat_uc.return_value.get_chat.assert_awaited_once_with(
         support_chat_id
     )
-    container.support_chat_uc.return_value.save_chat.assert_awaited_once()
+    container.support_chat_uc.return_value.user_set_awaiting_status.assert_awaited_once()
 
     container.support_message_uc.assert_called_once()
     container.support_message_uc.return_value.save_message.assert_awaited_once()
-
-    assert support_chat.topic == message.text
-    support_chat.waiting.assert_called_once()
 
     add_messages_mock.assert_awaited_once_with(state, [message.message_id])

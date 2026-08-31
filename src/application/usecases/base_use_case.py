@@ -1,4 +1,21 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
+
+
+class SyncBaseUnitOfWork:
+    def __init__(
+        self,
+        session_factory: sessionmaker[Session],
+    ) -> None:
+        self.session_factory = session_factory
+        self.session: Session | None = None
+
+    def __enter__(self):
+        self.session = self.session_factory()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.session.close()
 
 
 class AsyncBaseUnitOfWork:

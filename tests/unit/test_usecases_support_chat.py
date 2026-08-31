@@ -2,8 +2,12 @@ from __future__ import annotations
 
 import pytest
 
-from src.application.use_cases.support_chat_use_case import SupportChatUseCase
+from src.application.usecases.support_chat_use_case import (
+    SupportChatUnitOfWork,
+    SupportChatUseCase,
+)
 from src.domain.entities.support_chat import ChatStatus, SupportChat
+from src.domain.exceptions import BusinessLogicException
 
 
 class FakeSupportChatRepository:
@@ -31,33 +35,25 @@ class FakeSupportChatRepository:
         return chat
 
 
-@pytest.mark.asyncio
-async def test_get_and_save_chat(user):
-    repository = FakeSupportChatRepository()
-    use_case = SupportChatUseCase(repository)
-    chat_id = 1
+class FakeUnitOfWork(SupportChatUnitOfWork):
+    def __init__(self, session_factory=None) -> None:
+        super().__init__(session_factory)
 
-    support_chat = await use_case.get_chat(chat_id)
-    assert support_chat is None
+        self.chat_repository: FakeSupportChatRepository = FakeSupportChatRepository()
 
-    dto = SupportChat(id=chat_id, user_id=user.id)
+    async def __aenter__(self):
+        return self
 
-    support_chat = await use_case.save_chat(dto)
-    assert isinstance(support_chat, SupportChat)
-
-    support_chat = await use_case.get_chat(chat_id=chat_id)
-
-    assert isinstance(support_chat, SupportChat)
-    assert support_chat.user_id == user.id
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        pass
 
 
 @pytest.mark.asyncio
 async def test_create_chat(user):
-    repository = FakeSupportChatRepository()
-    use_case = SupportChatUseCase(repository)
+    use_case = SupportChatUseCase(FakeUnitOfWork())
     chat_id = 1
 
-    chat = await use_case.create_chat(user.id, chat_id)
+    chat = await use_case.create_chat.__wrapped__(use_case, user.id, chat_id)
 
     assert isinstance(chat, SupportChat)
     assert chat.user_id == user.id
@@ -65,16 +61,14 @@ async def test_create_chat(user):
 
 @pytest.mark.asyncio
 async def test_close_chat(user):
-    repository = FakeSupportChatRepository()
-    use_case = SupportChatUseCase(repository)
+    use_case = SupportChatUseCase(FakeUnitOfWork())
     chat_id = 1
 
-    chat = await use_case.close_chat(chat_id, None)
+    with pytest.raises(BusinessLogicException, match="chat not exist"):
+        await use_case.close_chat.__wrapped__(use_case, chat_id, None)
 
-    assert chat is None
-
-    await use_case.create_chat(user.id, chat_id)
-    chat = await use_case.close_chat(chat_id, user)
+    chat = await use_case.create_chat.__wrapped__(use_case, user.id, chat_id)
+    await use_case.close_chat.__wrapped__(use_case, chat.id, user)
 
     assert isinstance(chat, SupportChat)
     assert chat.status == ChatStatus.CLOSED

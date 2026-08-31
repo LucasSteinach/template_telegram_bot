@@ -45,6 +45,7 @@ def support_chat_entity():
     def create(**kwargs):
         data = {
             "id": 1,
+            "telegram_id": 12341234,
             "user_id": 2,
             "topic": None,
             "operator_id": None,

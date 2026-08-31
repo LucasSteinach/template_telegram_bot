@@ -2,8 +2,12 @@ from __future__ import annotations
 
 import pytest
 
-from src.application.use_cases.support_message_use_case import SupportMessageUseCase
+from src.application.usecases.support_message_use_case import (
+    SupportMessageUnitOfWork,
+    SupportMessageUseCase,
+)
 from src.domain.entities.support_message import SupportMessage
+from src.domain.exceptions import BusinessLogicException
 
 
 class FakeSupportMessageRepository:
@@ -23,20 +27,35 @@ class FakeSupportMessageRepository:
         return message
 
 
+class FakeUnitOfWork(SupportMessageUnitOfWork):
+    def __init__(self, session_factory=None) -> None:
+        super().__init__(session_factory)
+
+        self.message_repository: FakeSupportMessageRepository = (
+            FakeSupportMessageRepository()
+        )
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+
 @pytest.mark.asyncio
 async def test_get_and_save_message():
-    repository = FakeSupportMessageRepository()
-    use_case = SupportMessageUseCase(repository)
+    use_case = SupportMessageUseCase(FakeUnitOfWork())
     message_id = 1
 
-    support_message = await use_case.get_message(message_id)
-    assert support_message is None
+    with pytest.raises(BusinessLogicException, match="support message not exist"):
+        await use_case.get_message.__wrapped__(use_case, message_id)
 
     dto = SupportMessage(
         id=message_id, chat_id=10, author_id=20, author_role="user", text="message_text"
     )
 
-    support_message = await use_case.save_message(
+    support_message = await use_case.save_message.__wrapped__(
+        use_case,
         chat_id=dto.chat_id,
         author_id=dto.author_id,
         author_role=dto.author_role,
@@ -46,6 +65,6 @@ async def test_get_and_save_message():
 
     assert isinstance(support_message, SupportMessage)
 
-    support_message = await use_case.get_message(message_id)
+    support_message = await use_case.get_message.__wrapped__(use_case, message_id)
 
     assert isinstance(support_message, SupportMessage)

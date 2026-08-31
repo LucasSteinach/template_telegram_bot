@@ -1,3 +1,5 @@
+import itertools
+
 import pytest
 from aiogram.types import (
     InlineKeyboardButton,
@@ -9,7 +11,7 @@ from aiogram.types import (
 from src.infrastructure.telegram.callbacks import AwaitedActionCallback, MenuCallback
 from src.infrastructure.telegram.keyboards import inline_keyboard as ik
 from src.infrastructure.telegram.keyboards import reply_keyboard as rk
-from src.infrastructure.telegram.menu.constants import MENU
+from src.infrastructure.telegram.menu.menu import MENU
 
 
 def test_inline_button():
@@ -200,5 +202,6 @@ def test_build_keyboard():
     keyboard = ik.build_keyboard(not_root_item_with_children)
 
     assert (
-        len(keyboard.inline_keyboard) == len(not_root_item_with_children.children) + 1
+        len(list(itertools.chain.from_iterable(keyboard.inline_keyboard)))
+        == len(not_root_item_with_children.children) + 1
     )

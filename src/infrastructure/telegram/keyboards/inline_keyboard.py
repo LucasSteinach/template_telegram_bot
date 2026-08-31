@@ -5,8 +5,8 @@ import aiogram.types as t
 from pydantic import BaseModel, model_validator
 
 from src.infrastructure.telegram.callbacks import AwaitedActionCallback, MenuCallback
-from src.infrastructure.telegram.menu.menu import MENU, MenuItem
 from src.infrastructure.telegram.menu.helpers import get_path_to_item
+from src.infrastructure.telegram.menu.menu import MENU, MenuItem
 
 logger = logging.getLogger(__name__)
 
