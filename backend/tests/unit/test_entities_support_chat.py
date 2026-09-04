@@ -1,23 +1,13 @@
 from datetime import datetime
 
-from domain.entities.support_chat import ChatStatus, SupportChat
+from domain.entities.support_chat import ChatStatus
 from domain.entities.user import UserRole
 
 
-def support_chat():
-    return SupportChat(
-        id=1,
-        telegram_id=12341234,
-        user_id=1,
-        topic="test_topic",
-    )
-
-
-def test_assign_operator():
-    chat = support_chat()
+def test_assign_operator(support_chat_entity):
+    chat = support_chat_entity(operator_id=None)
     operator_id = 2
 
-    assert chat.operator_id is None
     assert chat.status == ChatStatus.CREATED
 
     last_activity_at = chat.last_activity_at
@@ -29,16 +19,24 @@ def test_assign_operator():
     assert chat.last_activity_at > last_activity_at
 
 
-def test_set_waiting():
-    chat = support_chat()
+def test_activate(support_chat_entity):
+    chat = support_chat_entity()
+
+    chat.activate()
+
+    assert chat.status == ChatStatus.ACTIVE
+
+
+def test_set_waiting(support_chat_entity):
+    chat = support_chat_entity()
 
     chat.set_waiting()
 
     assert chat.status == ChatStatus.WAITING
 
 
-def test_close_by_user():
-    chat = support_chat()
+def test_close_by_user(support_chat_entity):
+    chat = support_chat_entity()
 
     chat.close_by_user()
 
@@ -47,8 +45,8 @@ def test_close_by_user():
     assert chat.closed_by == "user"
 
 
-def test_close_by_operator():
-    chat = support_chat()
+def test_close_by_operator(support_chat_entity):
+    chat = support_chat_entity()
     operator_id, operator_role = 2, UserRole.OPERATOR
 
     chat.close_by_operator(operator_id, operator_role)

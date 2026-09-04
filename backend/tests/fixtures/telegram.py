@@ -5,42 +5,9 @@ import pytest
 from aiogram.types import Chat
 from aiogram.types import User as TelegramUser
 
-from config import Settings
 from domain.entities.user import User, UserRole
 from infrastructure.telegram import bot as tg_bot
 from infrastructure.telegram.menu.menu import MenuItem
-
-
-@pytest.fixture(
-    # autouse=True  to check for warnings' source
-)
-def check_gc():
-    import tracemalloc
-
-    tracemalloc.start(10)
-    yield
-    import gc
-
-    gc.collect()
-
-
-@pytest.fixture
-def settings():
-    return Settings(
-        bot_token="123:test",
-        db_user="db_user",
-        db_password="db_password",
-        db_host="db_host",
-        db_port="1234",
-        db_name="db_name",
-        log_level="DEBUG",
-        support_user="12345:@test_support_user",
-        fsm_storage="redis",
-        redis_url="redis://localhost:6379",
-        jwt_secret="",
-        access_exp_sec=100,
-        refresh_exp_sec=500,
-    )
 
 
 @pytest.fixture
@@ -67,7 +34,7 @@ def telegram_user():
 @pytest.fixture
 def user():
     return User(
-        id=123,
+        id=12341234,
         username="Test User",
         full_name="Fullname Test User",
         created_at=datetime(2025, 8, 12, tzinfo=timezone.utc),

@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.pool import StaticPool
 
+from application.services.auth import hash_password
 from infrastructure.database.models import BaseModel
 
 
@@ -50,3 +51,66 @@ async def clean_db(engine):
     async with engine.begin() as conn:
         for table in reversed(BaseModel.metadata.sorted_tables):
             await conn.execute(table.delete())
+
+
+# ======================================
+# Create test instances
+# ======================================
+
+
+@pytest_asyncio.fixture
+async def create_test_operator(app, operator_instance, clean_db):
+    uow = app.state.container.operator_uow()
+
+    new_operator = operator_instance(
+        email="test@test.com",
+        password=hash_password("12345678"),
+    )
+
+    async with uow, uow.session.begin():
+        uow.session.add(new_operator)
+
+    yield new_operator
+
+
+@pytest_asyncio.fixture
+async def create_test_user(app, user_instance, clean_db):
+    uow = app.state.container.user_uow()
+
+    new_user = user_instance(
+        username="test_user",
+        full_name="Test User",
+        role="operator",
+    )
+
+    async with uow, uow.session.begin():
+        uow.session.add(new_user)
+
+    yield new_user
+
+
+@pytest_asyncio.fixture
+async def create_support_chat(app, support_chat_instance, clean_db):
+    uow = app.state.container.support_chat_uow()
+
+    new_chat = support_chat_instance(
+        operator_id=12341234,
+        status="waiting",
+    )
+
+    async with uow, uow.session.begin():
+        uow.session.add(new_chat)
+
+    yield new_chat
+
+
+@pytest_asyncio.fixture
+async def create_support_message(app, support_message_instance, clean_db):
+    uow = app.state.container.support_message_uow()
+
+    new_message = support_message_instance()
+
+    async with uow, uow.session.begin():
+        uow.session.add(new_message)
+
+    yield new_message

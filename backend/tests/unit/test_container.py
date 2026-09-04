@@ -1,5 +1,6 @@
 import pytest
 
+from application.services.auth import AuthService
 from application.usecases.operator_use_case import (
     OperatorUnitOfWork,
     OperatorUseCase,
@@ -43,3 +44,6 @@ async def test_container(session, settings):
 
     support_message_uc = container.support_message_uc()
     assert isinstance(support_message_uc, SupportMessageUseCase)
+
+    auth_service = container.auth_service()
+    assert isinstance(auth_service, AuthService)

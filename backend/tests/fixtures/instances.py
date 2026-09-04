@@ -4,6 +4,7 @@ import pytest
 
 from domain.entities.support_chat import ChatStatus
 from infrastructure.database.models import (
+    OperatorModel,
     SupportChatModel,
     SupportMessageModel,
     UserModel,
@@ -14,7 +15,7 @@ from infrastructure.database.models import (
 def user_instance():
     def create(**kwargs):
         data = {
-            "id": 1,
+            "id": 12341234,
             "username": "test_user",
             "full_name": "Test User",
             "created_at": datetime.now(tz=timezone.utc),
@@ -27,11 +28,27 @@ def user_instance():
 
 
 @pytest.fixture
+def operator_instance():
+    def create(**kwargs):
+        data = {
+            "id": 12341234,
+            "email": "test@test.com",
+            "password": "test_password",
+            "is_active": True,
+            "role": "operator",
+        }
+        data.update(kwargs)
+        return OperatorModel(**data)
+
+    return create
+
+
+@pytest.fixture
 def support_message_instance():
     def create(**kwargs):
         data = {
             "id": 1,
-            "chat_id": 2,
+            "chat_id": 1,
             "author_id": 3,
             "author_role": "user",
             "text": "test_text",
@@ -50,7 +67,7 @@ def support_chat_instance():
             "id": 1,
             "telegram_id": 12341234,
             "user_id": 2,
-            "topic": None,
+            "topic": "topic",
             "operator_id": None,
             "status": ChatStatus.CREATED,
             "created_at": datetime.now(tz=timezone.utc),

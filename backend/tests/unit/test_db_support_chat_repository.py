@@ -77,6 +77,61 @@ async def test_get_all_closed_chats(session, support_chat_entity):
     chats = await repository.get_all_closed_chats()
 
     assert isinstance(chats, list)
+    assert all(isinstance(chat, SupportChat) for chat in chats)
     assert len(chats) == 1
     assert id_ not in [c.id for c in chats]
     assert closed_chat_id in [c.id for c in chats]
+
+
+@pytest.mark.asyncio
+async def test_get_open_chats(session, support_chat_entity):
+    repository = SupportChatRepository(session)
+    chat_count = 3
+    for i in range(chat_count):
+        status = "created" if i != chat_count - 1 else "closed"
+        entity = support_chat_entity(id=i, status=status)
+        await repository.persist(entity)
+
+    chats = await repository.get_open_chats()
+
+    assert isinstance(chats, list)
+    assert all(isinstance(chat, SupportChat) for chat in chats)
+    assert len(chats) == chat_count - 1
+    assert chat_count - 1 not in [c.id for c in chats]
+
+
+@pytest.mark.asyncio
+async def test_assigned_chats(session, operator_entity, support_chat_entity):
+    repository = SupportChatRepository(session)
+    operator = operator_entity()
+    entity = support_chat_entity(operator_id=None)
+    await repository.persist(entity)
+
+    no_chats = await repository.get_assigned_chats(operator.id)
+
+    assert no_chats == []
+
+    entity.assign_operator(operator.id)
+    await repository.persist(entity)
+
+    chats = await repository.get_assigned_chats(operator.id)
+
+    assert len(chats) == 1
+    assert chats[0].operator_id == operator.id
+
+
+@pytest.mark.asyncio
+async def test_get_waiting_chats(session, support_chat_entity):
+    repository = SupportChatRepository(session)
+    chat_count = 3
+    for i in range(chat_count):
+        status = "waiting" if i != chat_count - 1 else "closed"
+        entity = support_chat_entity(id=i, status=status)
+        await repository.persist(entity)
+
+    chats = await repository.get_waiting_chats()
+
+    assert isinstance(chats, list)
+    assert all(isinstance(chat, SupportChat) for chat in chats)
+    assert len(chats) == chat_count - 1
+    assert chat_count - 1 not in [c.id for c in chats]

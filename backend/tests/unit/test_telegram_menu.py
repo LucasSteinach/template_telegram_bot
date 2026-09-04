@@ -2,9 +2,10 @@ from unittest.mock import ANY, AsyncMock
 
 import pytest
 
+from domain.exceptions import ApplicationException
 from infrastructure.telegram.handlers.menu import render_menu
 from infrastructure.telegram.menu.helpers import get_menu_item
-from infrastructure.telegram.menu.menu import MENU, MenuItem
+from infrastructure.telegram.menu.menu import MENU, MenuItem, validate_menu_ids
 
 
 def test_constants_menu_item(menu_item):
@@ -34,3 +35,32 @@ async def test_render_menu(message):
     await render_menu(message, "root")
 
     message.edit_text.assert_awaited_once_with(text=MENU.message_text, reply_markup=ANY)
+
+
+def test_validate_menu_ids():
+    duplicate_id = "duplicate_id"
+    item = MenuItem(
+        id="unique_id",
+        message_text="message_text",
+        button_text="",
+        type="menu",
+        children=[
+            MenuItem(
+                id=duplicate_id,
+                message_text="message_text",
+                button_text="",
+                type="menu",
+            ),
+            MenuItem(
+                id=duplicate_id,
+                message_text="message_text",
+                button_text="",
+                type="menu",
+            ),
+        ],
+    )
+
+    with pytest.raises(
+        ApplicationException, match=f"Duplicate menu item ids: {duplicate_id}"
+    ):
+        validate_menu_ids(item)

@@ -22,7 +22,12 @@ from infrastructure.telegram.handlers.actions.support import (
     process_message,
 )
 from infrastructure.telegram.handlers.fallback import delete_unhandled_messages
-from infrastructure.telegram.handlers.menu import menu_handler
+from infrastructure.telegram.handlers.menu import (
+    history_to_text,
+    menu_handler,
+    support_history_handler,
+)
+from infrastructure.telegram.handlers.operator import handle_support_message
 
 
 def test_handlers_init():
@@ -230,7 +235,7 @@ async def test_support_process_message(container, message, user):
         return_value=support_chat
     )
     container.support_chat_uc.return_value.save_chat = AsyncMock()
-    container.support_chat_uc.return_value.user_set_awaiting_status = AsyncMock()
+    container.support_chat_uc.return_value.user_set_waiting_status = AsyncMock()
 
     container.support_message_uc = MagicMock()
     container.support_message_uc.return_value.save_message = AsyncMock()
@@ -253,9 +258,71 @@ async def test_support_process_message(container, message, user):
     container.support_chat_uc.return_value.get_chat.assert_awaited_once_with(
         support_chat_id
     )
-    container.support_chat_uc.return_value.user_set_awaiting_status.assert_awaited_once()
+    container.support_chat_uc.return_value.user_set_waiting_status.assert_awaited_once()
 
     container.support_message_uc.assert_called_once()
     container.support_message_uc.return_value.save_message.assert_awaited_once()
 
     add_messages_mock.assert_awaited_once_with(state, [message.message_id])
+
+
+@pytest.mark.asyncio
+async def test_support_history_handler(callback, container, support_chat_entity, user):
+    path = "infrastructure.telegram.handlers.menu"
+    callback_data = MenuCallback(item_id="id")
+    support_chat = support_chat_entity(user_id=user.id)
+
+    container.support_chat_uc = MagicMock()
+    container.support_chat_uc.return_value.get_user_chats = AsyncMock(
+        return_value=[support_chat]
+    )
+
+    container.support_message_uc = MagicMock()
+    container.support_message_uc.return_value.get_chat_history = AsyncMock()
+
+    with (
+        patch(f"{path}.history_to_text") as history_to_text_mock,
+        patch(f"{path}.menu_handler") as menu_handler_mock,
+    ):
+        await support_history_handler(callback, callback_data, container)
+
+    container.support_chat_uc.return_value.get_user_chats.assert_awaited_once()
+    container.support_message_uc.return_value.get_chat_history.assert_awaited_once()
+    history_to_text_mock.assert_called_once()
+    menu_handler_mock.assert_awaited_once_with(callback, callback_data)
+    callback.message.edit_text.assert_awaited_once()
+
+
+def test_history_to_text(support_message_entity):
+    not_user_role = "operator"
+    history = [
+        support_message_entity(id=i, text=str(i), author_role=not_user_role)
+        for i in range(3)
+    ]
+
+    text = history_to_text(history)
+
+    assert isinstance(text, str)
+    assert not_user_role.upper() in text
+
+
+@pytest.mark.asyncio
+async def test_operator_handle_support_message(message):
+    chat_id = 1
+    text = "text"
+
+    bot = MagicMock()
+    bot.send_message = AsyncMock(return_value=message)
+
+    dispatcher = MagicMock()
+    dispatcher.fsm = MagicMock()
+    dispatcher.fsm.get_context = MagicMock(return_value={})
+
+    with patch(
+        "infrastructure.telegram.handlers.operator.add_messages_to_cleanup"
+    ) as cleanup_mock:
+        await handle_support_message(bot, dispatcher, chat_id, text)
+
+    bot.send_message.assert_awaited_once()
+    dispatcher.fsm.get_context.assert_called_once()
+    cleanup_mock.assert_awaited_once()

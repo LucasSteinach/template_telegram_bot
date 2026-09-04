@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 import pytest
 
+from domain.entities.operator import Operator
 from domain.entities.support_chat import ChatStatus, SupportChat
 from domain.entities.support_message import SupportMessage
 from domain.entities.user import User
@@ -19,6 +20,22 @@ def user_entity():
         }
         data.update(kwargs)
         return User(**data)
+
+    return create
+
+
+@pytest.fixture
+def operator_entity():
+    def create(**kwargs):
+        data = {
+            "id": 12341234,
+            "email": "test@test.com",
+            "password": "test_password",
+            "is_active": True,
+            "role": "operator",
+        }
+        data.update(kwargs)
+        return Operator(**data)
 
     return create
 
@@ -47,8 +64,8 @@ def support_chat_entity():
             "id": 1,
             "telegram_id": 12341234,
             "user_id": 2,
-            "topic": None,
-            "operator_id": None,
+            "topic": "topic",
+            "operator_id": 12341234,
             "status": ChatStatus.CREATED,
             "created_at": datetime.now(tz=timezone.utc),
             "closed_at": None,
