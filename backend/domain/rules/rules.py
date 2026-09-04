@@ -10,7 +10,7 @@ class BaseRule(BaseModel):
         return self._message
 
     def is_violated(self) -> bool:
-        pass
+        raise NotImplementedError
 
     def __str__(self):
         return self.get_message()

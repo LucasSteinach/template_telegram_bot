@@ -11,7 +11,6 @@ from collections.abc import Sequence
 import sqlalchemy as sa
 
 from alembic import op
-
 from application.services.auth import hash_password
 from config import settings
 

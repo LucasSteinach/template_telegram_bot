@@ -45,8 +45,55 @@ coverage-badge = "1.1.2"
 pytest-cov = "7.1.0"
 
 ruff = "0.16.0"
+testcontainers = "^4.15.0"
+pika = "^1.4.4"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "Depends",
+    "fastapi.security.HTTPBearer",
+    "HTTPBearer",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore:The @wait_container_is_ready decorator is deprecated:DeprecationWarning"
+]
+addopts = "--cov=. --cov-report=html --cov-report=term-missing"
+#unfreeze to create a coverage report
+
+testpaths = [
+    "tests",
+]
+# filterwarnings = [
+#     "error::RuntimeWarning",
+# ]
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "tests/*",
+    "alembic/*",
+    "*/venv/*",
+    "*/.venv/*",
+    "*api_main.py",
+    "*bot_main.py",
+#    "*/__init__.py",
+    "*/env.py",
+]
+concurrency = ["thread", "greenlet"]
+
+[tool.coverage.html]
+directory = "tests/coverage"
+
+[tool.coverage.report]
+exclude_lines = [
+    "raise NotImplementedError",
+]

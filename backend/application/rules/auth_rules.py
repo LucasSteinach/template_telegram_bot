@@ -16,4 +16,4 @@ class InvalidRefreshToken(ApplicationRule):
     data: dict | None
 
     def is_violated(self) -> bool:
-        return not self.data or self.data.get("type") != "access"
+        return not self.data or self.data.get("type") != "refresh"

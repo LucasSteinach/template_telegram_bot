@@ -10,7 +10,7 @@ from infrastructure.telegram.menu.helpers import get_menu_item
 router = Router(name="menu")
 
 
-def history_to_text(history: list[SupportMessage]):
+def history_to_text(history: list[SupportMessage]) -> str:
     texts = []
     for message in history:
         texts.append(

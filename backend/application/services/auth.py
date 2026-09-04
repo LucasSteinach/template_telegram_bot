@@ -142,23 +142,21 @@ class AuthService:
         return access_token, refresh_token, access_expires_in
 
     async def refresh_session(self, refresh_token: str) -> tuple[str, str, int]:
+        user = self.decode_refresh_token(refresh_token)
         payload = decode(refresh_token, self.jwt_secret)
-        check_app_rule(InvalidRefreshToken(data=payload))
 
-        user_id = int(payload["id_"])
         token_id = payload.get("data", {}).get("jti") or payload.get("jti")
-        role = payload.get("data", {}).get("role") or payload.get("role")
 
         if not token_id:
             raise ApplicationException("Missing token identifier (jti)")
 
-        is_valid_session = await self.redis.check_refresh_token(user_id, token_id)
+        is_valid_session = await self.redis.check_refresh_token(user.id, token_id)
         if not is_valid_session:
             raise ApplicationException("Refresh token revoked or expired")
 
-        await self.redis.delete_refresh_token(user_id, token_id)
+        await self.redis.delete_refresh_token(user.id, token_id)
 
-        return await self.new_session(user_id=user_id, role=role)
+        return await self.new_session(user_id=user.id, role=user.role)
 
     async def logout_session(self, refresh_token: str) -> None:
         try:

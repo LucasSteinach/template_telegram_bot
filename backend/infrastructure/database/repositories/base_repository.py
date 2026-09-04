@@ -24,6 +24,7 @@ class AsyncBaseRepository(ABC, Generic[ModelT, EntityT, IDT]):
     _id_field_name: str = "id"
 
     def __init__(self, session: AsyncSession):
+        assert session is not None
         self._session: AsyncSession = session
 
     @property

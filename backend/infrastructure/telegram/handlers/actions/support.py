@@ -109,7 +109,7 @@ async def process_message(
         support_chat.id, user.id, user.role, message.text
     )
 
-    await support_chat_uc.user_set_awaiting_status(
+    await support_chat_uc.user_set_waiting_status(
         chat_id=support_chat.id, user=user, topic=truncate(message.text)
     )
 

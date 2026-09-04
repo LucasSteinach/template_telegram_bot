@@ -17,10 +17,10 @@ def register_exception_handlers(app: FastAPI) -> None:
 def business_exception_handler(_: Request, exc: BusinessLogicException):
     logger.warning(
         "Business rule violated: %s",
-        exc.rule.get_message,
+        exc.rule.get_message(),
     )
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         content=jsonable_encoder({"detail": exc.rule.get_message()}),
     )
 
@@ -28,7 +28,7 @@ def business_exception_handler(_: Request, exc: BusinessLogicException):
 def application_exception_handler(_: Request, exc: ApplicationException):
     logger.warning(
         "Application rule violated: %s",
-        exc.rule.get_message,
+        exc.rule.get_message(),
     )
     return JSONResponse(
         status_code=status.HTTP_406_NOT_ACCEPTABLE,

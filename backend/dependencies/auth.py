@@ -28,7 +28,7 @@ async def _get_user(
 async def get_auth_operator(
     credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
     auth_service: AuthService = Depends(get_auth_service),
-):
+) -> AuthUser:
     user = await _get_user(credentials, auth_service)
     if user.role not in [UserRole.OPERATOR, UserRole.ADMIN]:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
@@ -39,7 +39,7 @@ async def get_auth_operator(
 async def get_auth_admin(
     credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
     auth_service: AuthService = Depends(get_auth_service),
-):
+) -> AuthUser:
     user = await _get_user(credentials, auth_service)
     if user.role != UserRole.ADMIN:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")

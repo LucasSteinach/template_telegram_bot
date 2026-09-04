@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     rabbitmq_url: str | None = None
 
     @classmethod
-    @model_validator(mode='before')
+    @model_validator(mode="before")
     def assemble_rabbitmq_url(cls, data: dict) -> dict:
         print(data.get("RABBITMQ_URL"))
         if not data.get("RABBITMQ_URL"):

@@ -25,18 +25,22 @@ logger = logging.getLogger(__name__)
 class SupportChatReadModel(BaseModel):
     id: int
     telegram_id: int
+    operator_id: int
     topic: str
     user_id: int
     created_at: datetime
+    status: str
 
 
 def support_chat_read_model(c: SupportChat):
     return SupportChatReadModel(
         id=c.id,
         telegram_id=c.telegram_id,
+        operator_id=c.operator_id,
         topic=c.topic,
         user_id=c.user_id,
         created_at=c.created_at,
+        status=c.status,
     )
 
 
@@ -90,7 +94,7 @@ class SupportChatUseCase:
         )
 
     @async_transaction()
-    async def user_set_awaiting_status(
+    async def user_set_waiting_status(
         self, chat_id: int, user: User, topic: str
     ) -> SupportChat | None:
         support_chat = await self._get_chat(chat_id)

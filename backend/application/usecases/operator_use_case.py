@@ -40,7 +40,8 @@ class OperatorUseCase:
 
     @async_transaction(read_only=True)
     async def get_operator(self, user_id: int) -> Operator:
-        user = await self.get_user(user_id)
+        user = await self._get_user(user_id)
+        check_business_rule(UserExist(user=user))
         operator = await self.uow.operator_repository.find_by_id(user.id)
         check_business_rule(OperatorExist(operator=operator))
 
